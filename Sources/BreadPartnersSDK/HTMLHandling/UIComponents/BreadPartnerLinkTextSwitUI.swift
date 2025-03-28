@@ -12,6 +12,7 @@
 
 import SwiftUI
 
+/// A SwiftUI view for displaying tappable link-styled text in Bread Partner UI.
 @available(iOS 15, *)
 public struct BreadPartnerLinkTextSwitUI: View {
     private var text: String

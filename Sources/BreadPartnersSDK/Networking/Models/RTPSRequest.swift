@@ -12,7 +12,8 @@
 
 import Foundation
 
-struct RTPSRequest: Codable {
+/// Represents a request model for an RTPS.
+internal struct RTPSRequest: Codable {
     let urlPath: String?
     let firstName: String?
     let lastName: String?

@@ -12,6 +12,7 @@
 
 import Foundation
 
+/// Represents data for an RTPS call.
 public class RTPSData: @unchecked Sendable {
     public var financingType: BreadPartnersFinancingType?
     public var order: Order?
@@ -48,6 +49,7 @@ public class RTPSData: @unchecked Sendable {
     }
 }
 
+/// Enum representing mock options for supporting testing and mock configurations.
 public enum BreadPartnersMockOptions: String, CaseIterable, @unchecked Sendable
 {
     case noMock = ""

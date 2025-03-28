@@ -15,6 +15,7 @@ import SwiftUI
 @available(iOS 15, *)
 extension HTMLContentRenderer {
 
+    /// Creates an attributed string that combines normal text and a clickable link.
     func createSpannableText(
         text: String,
         linkText: String
@@ -37,6 +38,7 @@ extension HTMLContentRenderer {
         return combinedText
     }
 
+    /// Creates a plain, non-editable text view displaying content text.
     func createPlainTextView() -> UITextView {
         let textView = UITextView()
         textView.isEditable = false
@@ -46,6 +48,7 @@ extension HTMLContentRenderer {
         return textView
     }
 
+    /// Creates a styled action button with a specified action link.
     func createActionButton() -> UIButton {
         var contentText = textPlacementModel?.contentText ?? ""
         var actionLink = textPlacementModel?.actionLink ?? ""
@@ -72,10 +75,12 @@ extension HTMLContentRenderer {
         return button
     }
 
+    /// Creates a SwiftUI-based plain text view displaying content text.
     func createSwiftUIPlainTextView() -> BreadPartnerTextView {
         return BreadPartnerTextView(textPlacementModel?.contentText ?? "N/A")
     }
 
+    /// Creates a SwiftUI action button with a specified action link.
     func createSwiftUIActionButton() -> BreadPartnerButtonView {
         var contentText = textPlacementModel?.contentText ?? ""
         var actionLink = textPlacementModel?.actionLink ?? ""

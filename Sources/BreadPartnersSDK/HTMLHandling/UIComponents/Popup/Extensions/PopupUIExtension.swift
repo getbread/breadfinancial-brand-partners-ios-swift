@@ -15,7 +15,8 @@ import UIKit
 @available(iOS 15, *)
 extension PopupController {
 
-    func setupUI() async {
+    /// Sets up the user interface for the popup.
+    internal func setupUI() async {
         await setupPopupView()
 
         switch overlayType {
@@ -30,7 +31,7 @@ extension PopupController {
         }
     }
 
-    func setupPopupView() async {
+    internal func setupPopupView() async {
 
             view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         let popupStyle =  BreadPartnerDefaults.popupStyle
@@ -120,7 +121,7 @@ extension PopupController {
 
     }
 
-    private func setupEmbeddedOverlay() async {
+    internal func setupEmbeddedOverlay() async {
         guard let webViewURL = URL(string: popupModel.webViewUrl) else {
            await alertHandler.showAlert(
                 title: Constants.nativeSDKAlertTitle(),
@@ -162,7 +163,7 @@ extension PopupController {
         await MainActor.run { loader?.stopAnimating() }
     }
 
-    private func setupSingleProductOverlay() async {
+    internal func setupSingleProductOverlay() async {
         await MainActor.run {
 
             popupView.addSubview(scrollView)
@@ -194,7 +195,7 @@ extension PopupController {
         }
     }
 
-    func setupLoader() {
+    internal func setupLoader() {
         DispatchQueue.main.async {
             self.loader = LoaderIndicator(
                 frame: CGRect(
@@ -207,7 +208,7 @@ extension PopupController {
             self.popupView.addSubview(self.loader)
         }
     }
-    func applyConstraints() {
+    internal func applyConstraints() {
         NSLayoutConstraint.activate([
 
             popupView.centerXAnchor.constraint(
@@ -253,7 +254,7 @@ extension PopupController {
         ])
     }
 
-    func overlayProductConstraints() {
+    internal func overlayProductConstraints() {
         if !dynamicParentProductView.isHidden {
 
             NSLayoutConstraint.activate([
@@ -398,7 +399,7 @@ extension PopupController {
 
     }
 
-    func overlayEmbeddedConstraints() {
+    internal func overlayEmbeddedConstraints() {
         NSLayoutConstraint.activate([
 
             overlayEmbeddedView.topAnchor.constraint(
@@ -421,7 +422,7 @@ extension PopupController {
         ])
     }
 
-    func addSectionsToStackView(popupStyle: PopUpStyling) {
+    internal func addSectionsToStackView(popupStyle: PopUpStyling) {
         let tagPriorityList = ["h3", "h2", "p", "connector"]
         let bodyDivModel = popupModel.dynamicBodyModel.bodyDiv
 

@@ -14,11 +14,14 @@ import Foundation
 
 @available(iOS 15, *)
 extension PopupController {
+    
+    /// Handles the close button tap event..
     @objc func closeButtonTapped() {
         callback(.popupClosed)
         dismiss(animated: true, completion: nil)
     }
 
+    /// Handles the action button tap event. 
     @objc func actionButtonTapped() {
         callback(.actionButtonTapped)
         if let placementModel = webViewPlacementModel {

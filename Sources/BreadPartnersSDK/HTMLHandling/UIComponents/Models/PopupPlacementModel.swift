@@ -12,6 +12,7 @@
 
 import Foundation
 
+/// A model representing the placement details for a popup overlay.
 internal struct PopupPlacementModel: @unchecked Sendable {
     var overlayType: String
     var location: String?
@@ -34,6 +35,7 @@ internal struct PopupPlacementModel: @unchecked Sendable {
     }
 }
 
+/// A model representing the configuration of the primary action button.
 internal struct PrimaryActionButtonModel {
     var dataOverlayType: String?
     var dataContentFetch: String?
@@ -60,6 +62,7 @@ internal struct PrimaryActionButtonModel {
     }
 }
 
+/// Enum representing the different types of overlays that can be displayed for a placement.
 internal enum PlacementOverlayType: String {
     case embeddedOverlay = "EMBEDDED_OVERLAY"
     case singleProductOverlay = "SINGLE_PRODUCT_OVERLAY"
