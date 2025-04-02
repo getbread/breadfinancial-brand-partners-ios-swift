@@ -1,3 +1,15 @@
+//------------------------------------------------------------------------------
+//  File:          CommonUtils.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 import Foundation
 import UIKit
 
@@ -105,16 +117,17 @@ internal actor CommonUtils: NSObject {
         integrationKey: String,
         merchantConfiguration: MerchantConfiguration,
         rtpsData: RTPSData,
-        prescreenId: Int
+        prescreenId: Int?
     ) async -> URL? {
 
-        let queryParams: [String: String?] = [
-            "mockMO": rtpsData.mockResponse?.rawValue,
-            "mockPA": rtpsData.mockResponse?.rawValue,
-            "mockVL": rtpsData.mockResponse?.rawValue,
+        let mockResponseValue = rtpsData.mockResponse?.rawValue
+        
+        var queryParams: [String: String?] = [
+            "mockMO": mockResponseValue.takeIfNotEmpty(),
+            "mockPA": mockResponseValue.takeIfNotEmpty(),
+            "mockVL": mockResponseValue.takeIfNotEmpty(),
             "embedded": "true",
             "clientKey": integrationKey,
-            "prescreenId": "\(prescreenId)",
             "cardType": rtpsData.cardType,
             "urlPath": "screen name",
             "firstName": merchantConfiguration.buyer?.givenName,
@@ -128,6 +141,10 @@ internal actor CommonUtils: NSObject {
             "channel": rtpsData.channel,
         ]
 
+        if(prescreenId != nil){
+            queryParams["prescreenId"] = "\(prescreenId ?? 0)"
+        }
+        
         guard
             var urlComponents = URLComponents(
                 string: APIUrl(urlType: .rtpsWebUrl(type: "offer")).url)

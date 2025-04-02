@@ -1,10 +1,24 @@
+//------------------------------------------------------------------------------
+//  File:          PlacementResponse.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 import Foundation
 
+/// Represents the response containing placements.
 internal struct PlacementsResponse: Codable {
     let placements: [PlacementsModel]?
     let placementContent: [PlacementContentModel]?
 }
 
+/// Represents individual placement details in the response.
 internal struct PlacementsModel: Codable {
     let id: String?
     let content: PlacementContentReferenceModel?

@@ -1,3 +1,15 @@
+//------------------------------------------------------------------------------
+//  File:          FormViewModel.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 import BreadPartnersSDKSwift
 import Foundation
 import UIKit
@@ -76,7 +88,7 @@ class FormViewModel: ObservableObject {
                     case .onSDKEventLog(let logs):
                         self.logs += "\n" + "\(logs)"
                     default:
-                        print("Event::\(event)")
+                        break
                     }
                 }
 
@@ -120,8 +132,8 @@ class FormViewModel: ObservableObject {
                     additionalName: formData.middleName,
                     billingAddress: BreadPartnersAddress(
                         address1: formData.addressOne,
-                        locality: formData.state,
-                        region: formData.city,
+                        locality: formData.city,
+                        region: formData.state,
                         postalCode: formData.zip)
                 ),
                 storeNumber: formData.storeNumber
@@ -141,7 +153,7 @@ class FormViewModel: ObservableObject {
                     case .onSDKEventLog(let logs):
                         self.logs += "\n" + "\(logs)"
                     default:
-                        print("Event::\(event)")
+                        break
                     }
                 }
 

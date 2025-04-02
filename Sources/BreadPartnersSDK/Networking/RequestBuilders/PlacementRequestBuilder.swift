@@ -1,3 +1,15 @@
+//------------------------------------------------------------------------------
+//  File:          PlacementRequestBuilder.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 import Foundation
 
 /// `PlacementRequestBuilder` helps create a request for placements by collecting
@@ -28,18 +40,23 @@ class PlacementRequestBuilder {
             ENV: APIUrl.currentEnvironment.rawValue,
             LOCATION: placementData?.locationType?.rawValue,
             PRICE: placementData?.order?.totalPrice?.value,
-            CARDHOLDER_TIER: merchantConfiguration?.cardholderTier,
+            CARDHOLDER_TIER: merchantConfiguration?.cardholderTier
+                .takeIfNotEmpty(),
             STORE_NUMBER: merchantConfiguration?.storeNumber,
-            LOYALTY_ID: merchantConfiguration?.loyaltyID,
-            OVERRIDE_KEY: merchantConfiguration?.overrideKey,
-            CLIENT_VAR_1: merchantConfiguration?.clientVariable1,
-            CLIENT_VAR_2: merchantConfiguration?.clientVariable2,
-            CLIENT_VAR_3: merchantConfiguration?.clientVariable3,
-            CLIENT_VAR_4: merchantConfiguration?.clientVariable4,
-            DEPARTMENT_ID: merchantConfiguration?.departmentId,
-            channel: merchantConfiguration?.channel,
-            subchannel: merchantConfiguration?.subchannel,
-            CMP: merchantConfiguration?.campaignID,
+            LOYALTY_ID: merchantConfiguration?.loyaltyID.takeIfNotEmpty(),
+            OVERRIDE_KEY: merchantConfiguration?.overrideKey.takeIfNotEmpty(),
+            CLIENT_VAR_1: merchantConfiguration?.clientVariable1
+                .takeIfNotEmpty(),
+            CLIENT_VAR_2: merchantConfiguration?.clientVariable2
+                .takeIfNotEmpty(),
+            CLIENT_VAR_3: merchantConfiguration?.clientVariable3
+                .takeIfNotEmpty(),
+            CLIENT_VAR_4: merchantConfiguration?.clientVariable4
+                .takeIfNotEmpty(),
+            DEPARTMENT_ID: merchantConfiguration?.departmentId.takeIfNotEmpty(),
+            channel: merchantConfiguration?.channel.takeIfNotEmpty(),
+            subchannel: merchantConfiguration?.subchannel.takeIfNotEmpty(),
+            CMP: merchantConfiguration?.campaignID.takeIfNotEmpty(),
             ALLOW_CHECKOUT: placementData?.allowCheckout ?? false
         )
 

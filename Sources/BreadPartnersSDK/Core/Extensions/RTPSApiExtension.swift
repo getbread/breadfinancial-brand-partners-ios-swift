@@ -1,3 +1,15 @@
+//------------------------------------------------------------------------------
+//  File:          RTPSApiExtension.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 import Foundation
 
 
@@ -61,17 +73,17 @@ extension BreadPartnersSDK {
                     from: response, to: RTPSResponse.self
                 )
             let returnResultType = preScreenLookupResponse.returnCode
-            let prescreenResult = getPrescreenResult(from: returnResultType)
-            logger.printLog("PreScreenID:Result: \(prescreenResult)")
+            let prescreenResult = getPrescreenResult(from: returnResultType ?? "10")
+            prescreenId = preScreenLookupResponse.prescreenId
+            logger.printLog("PreScreenID:Result: \(prescreenResult )")
+            logger.printLog("PreScreenID: \(String(describing: prescreenId))")
 
-            /// Since this call runs in the background without user interaction, if the result is not "approved",
+            /// Since this call runs in the background without user interaction,
+            /// if the result is not "approved" or prescreenId is nill,
             /// we simply return without taking any further action.
-            if prescreenResult != .approved {
+            if prescreenResult != .approved || prescreenId == nil {
                 return
             }
-
-            prescreenId = preScreenLookupResponse.prescreenId
-            logger.printLog("PreScreenID: \(String(describing: prescreenId))")
 
             await fetchRTPSData()
 
@@ -96,21 +108,15 @@ extension BreadPartnersSDK {
                 integrationKey: integrationKey,
                 merchantConfiguration: merchantConfiguration!,
                 rtpsData: placementsConfiguration!.rtpsData!,
-                prescreenId: prescreenId ?? 0
+                prescreenId: prescreenId
             )?.absoluteString
-
-            let location =
-                placementsConfiguration?.rtpsData?.locationType
-                    == BreadPartnersLocationType.checkout
-                ? "RTPS-Approval"
-                : ""
 
             let request = PlacementRequest(
                 placements: [
                     PlacementRequestBody(
                         context: ContextRequestBody(
-                            ENV: "",
-                            LOCATION: location,
+                            ENV: merchantConfiguration?.env?.rawValue,
+                            LOCATION: "RTPS-Approval",
                             embeddedUrl: rtpsWebURL
                         )
                     )

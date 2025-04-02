@@ -1,5 +1,18 @@
+//------------------------------------------------------------------------------
+//  File:          Extensions.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 import UIKit
 
+//  Provides reusable extension methods for use across apps integrating the Bread Partners SDK.
 public extension UIImageView {
     func loadImage(from url: URL, completion: @escaping (Bool) -> Void) {
         DispatchQueue.global().async {
@@ -48,5 +61,16 @@ extension UILabel {
         if let textSize = style.textSize {
             self.font = self.font?.withSize(textSize)
         }
+    }
+}
+
+extension Optional where Wrapped == String {
+    func takeIfNotEmpty() -> String? {
+        guard let self = self,
+            !self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else {
+            return nil
+        }
+        return self
     }
 }

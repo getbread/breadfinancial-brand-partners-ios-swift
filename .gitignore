@@ -1,8 +1,85 @@
+# macOS system files
 .DS_Store
-/.build
-/Packages
+
+# Xcode
+*.xcworkspace
+*.xcuserstate
 xcuserdata/
 DerivedData/
+*.xcscmblueprint
+*.xccheckout
+
+# Swift Package Manager
+/.build
+/Packages
+.swiftpm/
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+
+# CocoaPods (in case someone uses it in example project)
+Pods/
+Podfile.lock
+
+# Carthage (if used for examples or tests)
+/Carthage
+Carthage/Build/
+
+# SwiftPM binary artifacts (if you're using them)
+/Artifacts
+
+# Fastlane (optional, for CI/CD)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Archive & Symbolication
+*.xcarchive
+*.dSYM.zip
+*.dSYM
+
+# Logs
+*.log
+
+# User-specific files
+*.swp
+*.swo
+*.orig
+
+# Credentials and config
+*.env
+*.key
+*.pem
 .netrc
+
+# Build products
+build/
+*.o
+*.a
+*.so
+*.dylib
+
+# Playground stuff
+timeline.xctimeline
+playground.xcworkspace
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# SwiftLint cache (if used)
+.swiftlint.yml
+.swiftlint.cache
+
+# Xcode previews
+.preview-thumbnails
+
+# Other
+.idea/
+*.iml
+.vscode/
+
+# Ignore 
+**/TestData.swift

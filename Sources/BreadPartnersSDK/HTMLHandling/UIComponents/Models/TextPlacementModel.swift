@@ -1,3 +1,16 @@
+//------------------------------------------------------------------------------
+//  File:          TextPlacementModel.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
+/// Struct representing the model for text placements.
 internal struct TextPlacementModel {
     let actionType: String?
     let actionTarget: String?
@@ -6,6 +19,7 @@ internal struct TextPlacementModel {
     let actionContentId: String?
 }
 
+/// Enum representing the different action types associated with a placement.
 internal enum PlacementActionType: String {
     case showOverlay = "SHOW_OVERLAY"
     case redirect = "REDIRECT"

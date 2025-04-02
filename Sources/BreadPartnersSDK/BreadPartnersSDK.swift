@@ -1,6 +1,20 @@
+//------------------------------------------------------------------------------
+//  File:          BreadPartnersSDK.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 import Foundation
 import UIKit
 
+/// The primary interface class for interacting with the Bread Partners SDK.
+/// Provides entry points for initialization, configuration, and SDK-level actions.
 @available(iOS 15, *)
 public class BreadPartnersSDK: NSObject, UITextViewDelegate {
 
@@ -11,23 +25,6 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
 
     var integrationKey: String = ""
 
-    //    var logger: Logger
-    //    var alertHandler: AlertHandler
-    //    var commonUtils: CommonUtils
-    //    var apiClient: APIClient
-    //    var recaptchaManager: RecaptchaManager
-    //    var analyticsManager: AnalyticsManager
-    //    var swiftSoupParser: SwiftSoupParser
-    //    var htmlContentParser: HTMLContentParser
-    //    var htmlContentRenderer: HTMLContentRenderer
-    //    var breadPartnerDefaults: BreadPartnerDefaults
-    //    var callback: @Sendable (BreadPartnerEvents) -> Void = { _ in }
-    //    var rtpsFlow: Bool = false
-    //    var openPlacementExperience: Bool = false
-    //    var prescreenId: Int? = nil
-    //    var splitTextAndAction: Bool = false
-    //    var forSwiftUI: Bool = false
-
     var logger: Logger
     var alertHandler: AlertHandler
     var commonUtils: CommonUtils
@@ -37,7 +34,6 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
     var swiftSoupParser: SwiftSoupParser
     var htmlContentParser: HTMLContentParser
     var htmlContentRenderer: HTMLContentRenderer
-    var breadPartnerDefaults: BreadPartnerDefaults
     var callback: @Sendable (BreadPartnerEvents) -> Void = { _ in }
     var rtpsFlow: Bool = false
     var openPlacementExperience: Bool = false
@@ -87,9 +83,9 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
             recaptchaManager: self.recaptchaManager,
             callback: self.callback
         )
-        self.breadPartnerDefaults = BreadPartnerDefaults.shared
     }
 
+    var sdkEnvironment: BreadPartnersEnvironment = .stage
     var merchantConfiguration: MerchantConfiguration?
     var placementsConfiguration: PlacementConfiguration?
     var brandConfiguration: BrandConfigResponse?
@@ -108,6 +104,8 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
                         code: 404)))
         }
 
+        merchantConfiguration?.env = sdkEnvironment
+        
         await alertHandler.setUpAlerts(rtpsFlow, logger, callback)
 
         await analyticsManager.setApiKey(integrationKey)
@@ -142,6 +140,7 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
         enableLog: Bool
     ) async {
         await APIUrl.setEnvironment(environment)
+        sdkEnvironment = environment
         self.integrationKey = integrationKey
         self.logger.isLoggingEnabled = enableLog
         return await fetchBrandConfig()

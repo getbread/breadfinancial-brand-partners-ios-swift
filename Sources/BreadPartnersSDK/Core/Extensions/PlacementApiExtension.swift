@@ -1,8 +1,20 @@
+//------------------------------------------------------------------------------
+//  File:          PlacementApiExtension.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 @available(iOS 15, *)
 extension BreadPartnersSDK {
 
     /// Retrieve brand-specific configurations, such as the Recaptcha key.
-    func fetchBrandConfig() async {
+    internal func fetchBrandConfig() async {
         let apiUrl = APIUrl(urlType: .brandConfig(brandId: integrationKey)).url
 
         do {
@@ -23,7 +35,7 @@ extension BreadPartnersSDK {
 
     /// This method is called to fetch placement data,
     /// which will be displayed as a text view with a clickable button in the brand partner's UI.
-    func fetchPlacementData() async {
+    internal func fetchPlacementData() async {
         do {
             let apiUrl = APIUrl(urlType: .generatePlacements).url
             var request: Any? = nil
@@ -41,7 +53,7 @@ extension BreadPartnersSDK {
             )
             await handlePlacementResponse(response)
         } catch {
-            await  alertHandler.showAlert(
+            await alertHandler.showAlert(
                 title: Constants.nativeSDKAlertTitle(),
                 message: Constants.apiError(
                     message: error.localizedDescription),
@@ -50,7 +62,7 @@ extension BreadPartnersSDK {
         }
     }
 
-    func handlePlacementResponse(_ response: AnySendable) async {
+    internal func handlePlacementResponse(_ response: AnySendable) async {
         do {
             let responseModel: PlacementsResponse =
                 try await commonUtils.decodeJSON(
@@ -74,7 +86,7 @@ extension BreadPartnersSDK {
                                 ?? ""
                         )
                 else {
-                    await  alertHandler.showAlert(
+                    await alertHandler.showAlert(
                         title: Constants.nativeSDKAlertTitle(),
                         message: Constants.popupPlacementParsingError,
                         showOkButton: true
@@ -97,7 +109,7 @@ extension BreadPartnersSDK {
             }
 
         } catch {
-            await   alertHandler.showAlert(
+            await alertHandler.showAlert(
                 title: Constants.nativeSDKAlertTitle(),
                 message: Constants.catchError(
                     message: error.localizedDescription),

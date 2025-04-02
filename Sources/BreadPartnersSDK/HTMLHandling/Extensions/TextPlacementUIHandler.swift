@@ -1,8 +1,21 @@
+//------------------------------------------------------------------------------
+//  File:          TextPlacementUIHandler.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 import UIKit
 
 @available(iOS 15, *)
 extension HTMLContentRenderer {
 
+    /// Renders a text view and action button for either SwiftUI or UIKit.
     func renderTextAndButton() {
         if forSwiftUI {
             let plainTextView = createSwiftUIPlainTextView()
@@ -24,6 +37,7 @@ extension HTMLContentRenderer {
         }
     }
 
+    /// Renders a text view with a clickable link, either for SwiftUI or UIKit.
     func renderTextViewWithLink() {
 
         var contentText = textPlacementModel?.contentText ?? ""
@@ -71,6 +85,7 @@ extension HTMLContentRenderer {
         }
     }
 
+    /// Handles the tap event of an action button, triggering the link interaction.
     @objc func handleButtonTap(_ sender: UIButton) {
         guard let link = sender.accessibilityIdentifier else { return }
 
@@ -79,6 +94,7 @@ extension HTMLContentRenderer {
         }
     }
 
+    /// Handles the link interaction for a given link, performing the appropriate action based on the action type.
     func handleLinkInteraction(link: String) async {
         guard let placementModel = textPlacementModel,
             let responseModel = responseModel

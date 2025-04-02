@@ -1,5 +1,18 @@
+//------------------------------------------------------------------------------
+//  File:          PopupElements.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 import UIKit
 
+/// An actor responsible for managing the elements within the popup.
 @available(iOS 15.0, *)
 internal actor PopupElements: NSObject {
 
@@ -9,6 +22,7 @@ internal actor PopupElements: NSObject {
         super.init()
     }
 
+    /// Returns a close button with a system "xmark" icon.
     @MainActor func addCloseButton(
         target: Any, color: UIColor, action: Selector
     ) -> UIButton {
@@ -22,6 +36,7 @@ internal actor PopupElements: NSObject {
         return closeButton
     }
 
+    /// Creates a simple horizontal divider view.
     @MainActor func createHorizontalDivider(color: UIColor) -> UIView {
         let divider = UIView()
         divider.translatesAutoresizingMaskIntoConstraints = false
@@ -29,6 +44,7 @@ internal actor PopupElements: NSObject {
         return divider
     }
 
+    /// Creates a styled container view with optional border and corner radius.
     @MainActor func createContainerView(
         backgroundColor: UIColor, borderColor: CGColor? = nil,
         borderWidth: CGFloat = 0, cornerRadius: CGFloat = 12
@@ -46,6 +62,7 @@ internal actor PopupElements: NSObject {
         return containerView
     }
 
+    /// Creates a UILabel with attributed text and specified style.
     @MainActor func createLabel(
         withText text: NSAttributedString, style: PopupTextStyle,
         align: NSTextAlignment = .center
@@ -60,6 +77,7 @@ internal actor PopupElements: NSObject {
         return label
     }
 
+    /// Returns a UIStackView with specified axis and spacing.
     @MainActor func createStackView(
         axis: NSLayoutConstraint.Axis, spacing: CGFloat
     ) -> UIStackView {
@@ -71,6 +89,7 @@ internal actor PopupElements: NSObject {
         return stackView
     }
 
+    /// Creates a styled UIButton with target-action.
     @MainActor func createButton(
         target: Any,
         title: String,

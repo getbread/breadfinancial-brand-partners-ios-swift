@@ -1,6 +1,19 @@
+//------------------------------------------------------------------------------
+//  File:          PlacementRequest.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 import Foundation
 
-public struct PlacementRequest: Codable {
+/// Represents the request for placements.
+internal struct PlacementRequest: Codable {
     let placements: [PlacementRequestBody]?
     let brandId: String?
 
@@ -10,7 +23,8 @@ public struct PlacementRequest: Codable {
     }
 }
 
-public struct PlacementRequestBody: Codable {
+/// Represents individual placement request body.
+internal struct PlacementRequestBody: Codable {
     let id: String?
     let context: ContextRequestBody?
 
@@ -20,7 +34,8 @@ public struct PlacementRequestBody: Codable {
     }
 }
 
-public struct ContextRequestBody: Codable {
+/// Represents the context for a placement request.
+internal struct ContextRequestBody: Codable {
     let SDK_TID: String?
     let ENV: String?
     let RTPS_ID: String?
@@ -46,7 +61,7 @@ public struct ContextRequestBody: Codable {
     let UQP_PARAMS: String?
     let embeddedUrl: String?
 
-    public init(
+    internal init(
         SDK_TID: String? = nil,
         ENV: String? = nil,
         RTPS_ID: String? = nil,

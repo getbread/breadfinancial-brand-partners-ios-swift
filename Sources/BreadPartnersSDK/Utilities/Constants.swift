@@ -1,3 +1,15 @@
+//------------------------------------------------------------------------------
+//  File:          Constants.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 internal class Constants{
     
     // API constants
@@ -8,7 +20,7 @@ internal class Constants{
     static let headerContentType = "Content-Type"
     static let headerContentTypeValue = "application/json"
     static let headerOriginKey = "Origin"
-    static let headerOriginValue = "https://aspire-ep-demo.myshopify.com"
+    static let headerOriginValue = "https://brand-sdk.kmsmep.com"
     static let headerAuthorityKey = "authority"
     static let headerAuthorityValue = "metrics.kmsmep.com"
     static let headerAcceptKey = "Accept"

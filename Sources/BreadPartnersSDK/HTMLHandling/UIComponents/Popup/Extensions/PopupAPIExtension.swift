@@ -1,9 +1,22 @@
+//------------------------------------------------------------------------------
+//  File:          PopupAPIExtension.swift
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for iOS,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 import Foundation
 
 @available(iOS 15, *)
-extension PopupController {
+internal extension PopupController {
 
-    func fetchWebViewPlacement() async {
+    /// Fetches the web view placement data asynchronously by constructing a placement request and calling the API.
+    internal func fetchWebViewPlacement() async {
         let builder = PlacementRequestBuilder(
             integrationKey: integrationKey,
             merchantConfiguration: merchantConfiguration,
@@ -24,7 +37,8 @@ extension PopupController {
         await fetchData(requestBody: AnySendable(value: request))
     }
 
-    private func fetchData(requestBody: AnySendable) async {
+    /// Fetches data asynchronously from the API using the given request body.
+    internal func fetchData(requestBody: AnySendable) async {
         let apiUrl = APIUrl(urlType: .generatePlacements).url
         do {
             let response = try await apiClient.request(
@@ -40,7 +54,8 @@ extension PopupController {
         }
     }
 
-    private func handleResponse(_ response: AnySendable) async {
+    /// Handles the API response asynchronously by decoding the response data into a PlacementsResponse model.
+    internal func handleResponse(_ response: AnySendable) async {
         do {
             let responseModel: PlacementsResponse =
                 try await commonUtils.decodeJSON(
