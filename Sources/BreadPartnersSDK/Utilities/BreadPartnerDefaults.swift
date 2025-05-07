@@ -13,113 +13,63 @@
 import UIKit
 
 /// `BreadPartnerDefaults` class provides default configurations/styles/properties used across the BreadPartner SDK.
-public actor BreadPartnerDefaults: NSObject {
-
-    public static let shared = BreadPartnerDefaults()
-
-    private override init() {}
-
-    public let styleStruct: [String: [String: Any]] = [
-        "red": [
-            "primaryColor": "#d50132",
-            "secondaryColor": "#69727b",
-            "tertiaryColor": "#ececec",
-
-            "fontFamily": "JosefinSans-Bold",
-
-            "small": 12,
-            "medium": 15,
-            "large": 18,
-            "xlarge": 20,
-        ],
-        "orange": [
-            "primaryColor": "#FF935F",
-            "secondaryColor": "#69727b",
-            "tertiaryColor": "#ececec",
-
-            "fontFamily": "Lato-Bold",
-
-            "small": 12,
-            "medium": 15,
-            "large": 18,
-            "xlarge": 20,
-        ],
-        "cadet": [
-            "primaryColor": "#13294b",
-            "secondaryColor": "#69727b",
-            "tertiaryColor": "#ececec",
-
-            "fontFamily": "Poppins-Bold",
-
-            "small": 12,
-            "medium": 15,
-            "large": 18,
-            "xlarge": 20,
-        ],
-    ]
+public class BreadPartnerDefaults: NSObject {
 
     /// Default Popup Style
-    static let popupStyle = PopUpStyling(
+    public static let popupStyle = PopUpStyling(
         loaderColor: UIColor(hex: "#0f2233"),
         crossColor: .black,
         dividerColor: UIColor(hex: "#ececec"),
         borderColor: UIColor(hex: "#ececec").cgColor,
         titlePopupTextStyle: PopupTextStyle(
             font: UIFont(
-                name: "Arial-BoldMT",
+                name: "ArialMT",
                 size: 16.0
             ),
-            textColor: .black,
-            textSize: 16.0
+            textColor: .black
         ),
         subTitlePopupTextStyle: PopupTextStyle(
             font: UIFont(
-                name: "Arial-BoldMT",
+                name: "ArialMT",
                 size: 12.0
             ),
-            textColor: .gray,
-            textSize: 12.0
+            textColor: .gray
         ),
         headerPopupTextStyle: PopupTextStyle(
             font: UIFont(
-                name: "Arial-BoldMT",
+                name: "ArialMT",
                 size: 14.0
             ),
-            textColor: .gray,
-            textSize: 14.0
+            textColor: .gray
         ),
         headerBgColor: UIColor(hex: "#ececec"),
         headingThreePopupTextStyle: PopupTextStyle(
             font: UIFont(
-                name: "Arial-BoldMT",
+                name: "ArialMT",
                 size: 14.0
             ),
-            textColor: UIColor(hex: "#d50132"),
-            textSize: 14.0
+            textColor: UIColor(hex: "#d50132")
         ),
         paragraphPopupTextStyle: PopupTextStyle(
             font: UIFont(
-                name: "Arial-BoldMT",
+                name: "ArialMT",
                 size: 10.0
             ),
-            textColor: .gray,
-            textSize: 10.0
+            textColor: .gray
         ),
         connectorPopupTextStyle: PopupTextStyle(
             font: UIFont(
-                name: "Arial-BoldMT",
+                name: "ArialMT",
                 size: 14.0
             ),
-            textColor: .black,
-            textSize: 14.0
+            textColor: .black
         ),
         disclosurePopupTextStyle: PopupTextStyle(
             font: UIFont(
-                name: "Arial-BoldMT",
+                name: "ArialMT",
                 size: 10.0
             ),
-            textColor: .gray,
-            textSize: 10.0
+            textColor: .gray
         ),
         actionButtonStyle: PopupActionButtonStyle(
             font: UIFont.boldSystemFont(ofSize: 18),

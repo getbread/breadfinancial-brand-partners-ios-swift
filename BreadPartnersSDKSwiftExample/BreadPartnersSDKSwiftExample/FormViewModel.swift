@@ -35,9 +35,61 @@ class FormViewModel: ObservableObject {
         overlayResponse = nil
         error = nil
         logs = "No Logs"
-
+        
+        /// Prepare popup styling configuration object for each style elemnt
+        let popUpStyling = PopUpStyling(
+            loaderColor: formData.popupStyleThemes!.primaryColor,
+            crossColor: formData.popupStyleThemes!.primaryColor,
+            dividerColor: formData.popupStyleThemes!.boxColor,
+            borderColor: formData.popupStyleThemes!.boxColor.cgColor,
+            titlePopupTextStyle: PopupTextStyle(
+                font: UIFont(
+                    name: formData.fontName, size: Double(formData.popupStyleThemes!.xlargeTextSize)),
+                textColor: formData.popupStyleThemes!.darkColor
+            ),
+            subTitlePopupTextStyle: PopupTextStyle(
+                font: UIFont(
+                    name: formData.fontName, size: Double(formData.popupStyleThemes!.mediumTextSize)),
+                textColor: formData.popupStyleThemes!.lightColor
+            ),
+            headerPopupTextStyle: PopupTextStyle(
+                font: UIFont(
+                    name: formData.fontName, size: Double(formData.popupStyleThemes!.mediumTextSize)),
+                textColor: formData.popupStyleThemes!.darkColor
+            ),
+            headerBgColor: formData.popupStyleThemes!.boxColor,
+            headingThreePopupTextStyle: PopupTextStyle(
+                font: UIFont(
+                    name: formData.fontName, size: Double(formData.popupStyleThemes!.largeTextSize)),
+                textColor: formData.popupStyleThemes!.primaryColor
+            ),
+            paragraphPopupTextStyle: PopupTextStyle(
+                font: UIFont(
+                    name: formData.fontName, size: Double(formData.popupStyleThemes!.smallTextSize)),
+                textColor: formData.popupStyleThemes!.lightColor
+            ),
+            connectorPopupTextStyle: PopupTextStyle(
+                font: UIFont(
+                    name: formData.fontName, size: Double(formData.popupStyleThemes!.largeTextSize)),
+                textColor: formData.popupStyleThemes!.darkColor
+            ),
+            disclosurePopupTextStyle: PopupTextStyle(
+                font: UIFont(
+                    name: formData.fontName, size: Double(formData.popupStyleThemes!.smallTextSize)),
+                textColor: formData.popupStyleThemes!.lightColor
+            ),
+            actionButtonStyle: PopupActionButtonStyle(
+                font: UIFont(
+                    name: formData.fontName, size: Double(formData.popupStyleThemes!.mediumTextSize)),
+                textColor: .white,
+                backgroundColor: formData.popupStyleThemes!.primaryColor,
+                cornerRadius: formData.popupStyleThemes!.cornerRadius,
+                padding: UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+            )
+        )
+                
         Task {
-
+            
             await BreadPartnersSDK.shared.setup(
                 environment: formData.sdkEnv,
                 integrationKey: formData.apiKey,
@@ -68,7 +120,8 @@ class FormViewModel: ObservableObject {
                         ),
                         defaultSelectedCardKey: formData.defaultSelectedCardKey,
                         selectedCardKey: formData.selectedCardKey
-                    )
+                    ),
+                    popUpStyling: formData.stylePopup ? popUpStyling : nil
                 ),
                 splitTextAndAction: formData.separateTextAndButton,
                 forSwiftUI: true

@@ -103,6 +103,10 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
                             "Brand configurations are missing or unavailable.",
                         code: 404)))
         }
+        
+        if self.placementsConfiguration?.popUpStyling == nil {
+            self.placementsConfiguration?.popUpStyling = BreadPartnerDefaults.popupStyle
+        }
 
         merchantConfiguration?.env = sdkEnvironment
         

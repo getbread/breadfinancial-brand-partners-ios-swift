@@ -17,16 +17,16 @@ struct DynamicFonts: View {
     @Binding var formData: PlacementFormData
 
     @State private var fontSize: CGFloat = 16
-    @State private var selectedFont: String = "Gentium"
+    @State private var selectedFont: String = "ArialMT"
     
-    let fonts = ["Gentium Plus", "Gloria Hallelujah", "Kaushan Script", "Maven Pro", "Pacifico"]
+    let fonts = ["Noteworthy-Light", "Georgia-Bold", "Verdana-Bold", "Avenir-Heavy", "Zapfino"]
     
     var fontMapping: [String: String] = [
-        "Gentium Plus": "Gentium Plus",
-        "Gloria Hallelujah": "Gloria Hallelujah",
-        "Kaushan Script": "Kaushan Script",
-        "Maven Pro": "Maven Pro",
-        "Pacifico": "Pacifico"
+        "Noteworthy-Light": "Noteworthy-Light",
+        "Georgia-Bold": "Georgia-Bold",
+        "Verdana-Bold": "Verdana-Bold",
+        "Avenir-Heavy": "Avenir-Heavy",
+        "Zapfino": "Zapfino"
     ]
     
     

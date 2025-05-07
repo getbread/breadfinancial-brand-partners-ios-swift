@@ -16,16 +16,20 @@ import UIKit
 /// - Parameters:
 ///   - placementData: Defines text placements on the brand partner screen for the `registerPlacementFlow`.
 ///   - rtpsData: Specifies the real-time pre-screen configuration for the prescreen flow.
+///   - popUpStyling: Configures the popup styling for each element rendered within the popup.
 public struct PlacementConfiguration {
     public let placementData: PlacementData?
     public let rtpsData: RTPSData?
+    public var popUpStyling: PopUpStyling?
 
     public init(
         placementData: PlacementData? = nil,
-        rtpsData: RTPSData? = nil
+        rtpsData: RTPSData? = nil,
+        popUpStyling: PopUpStyling? = nil
     ) {
         self.placementData = placementData
         self.rtpsData = rtpsData
+        self.popUpStyling = popUpStyling
     }
 }
 
@@ -34,7 +38,7 @@ public struct PlacementConfiguration {
 /// - Colors are defined using `UIColor` or `CGColor` for various popup elements like header background, border..
 /// - Text style are configured using `PopupTextStyle`structure  for titles, headers, and other text elements.
 /// - Button style can be optionally specified using `PopupActionButtonStyle`.
-public struct PopUpStyling {
+public struct PopUpStyling: @unchecked Sendable {
     public let loaderColor: UIColor
     public let crossColor: UIColor
     public let dividerColor: UIColor
@@ -84,18 +88,15 @@ public struct PopUpStyling {
 ///
 /// - `font`: Specifies the font family and font size for the text.
 /// - `textColor`: Specifies the color of the text.
-/// - `textSize`: Specifies the size of the text.
-public struct PopupTextStyle {
+public struct PopupTextStyle: @unchecked Sendable {
     public var font: UIFont? = nil
     public var textColor: UIColor? = nil
-    public var textSize: CGFloat? = nil
 
     public init(
-        font: UIFont? = nil, textColor: UIColor? = nil, textSize: CGFloat? = nil
+        font: UIFont? = nil, textColor: UIColor? = nil
     ) {
         self.font = font
         self.textColor = textColor
-        self.textSize = textSize
     }
 }
 

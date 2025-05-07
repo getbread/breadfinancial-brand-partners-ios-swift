@@ -33,97 +33,101 @@ extension PopupController {
 
     internal func setupPopupView() async {
 
-            view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
-        let popupStyle =  BreadPartnerDefaults.popupStyle
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        guard let popupStyle = placementsConfiguration?.popUpStyling else {
+            return
+        }
 
-            popupView = PopupElements.shared.createContainerView(
-                backgroundColor: .white)
+        popupView = PopupElements.shared.createContainerView(
+            backgroundColor: .white)
 
-            topRowView = UIView()
-            topRowView.translatesAutoresizingMaskIntoConstraints = false
+        topRowView = UIView()
+        topRowView.translatesAutoresizingMaskIntoConstraints = false
 
-            bottomRowView = UIView()
-            bottomRowView.translatesAutoresizingMaskIntoConstraints = false
+        bottomRowView = UIView()
+        bottomRowView.translatesAutoresizingMaskIntoConstraints = false
 
-            closeButton = PopupElements.shared.addCloseButton(
-                target: self, color: popupStyle.crossColor,
-                action: #selector(closeButtonTapped))
-            dividerTop = PopupElements.shared.createHorizontalDivider(
-                color: popupStyle.dividerColor)
-            dividerBottom = PopupElements.shared.createHorizontalDivider(
-                color: popupStyle.dividerColor)
-            titleLabel = PopupElements.shared.createLabel(
-                withText: popupModel.overlayTitle,
-                style: popupStyle.titlePopupTextStyle)
-            subtitleLabel = PopupElements.shared.createLabel(
-                withText: popupModel.overlaySubtitle,
-                style: popupStyle.subTitlePopupTextStyle)
-            disclosureLabel = PopupElements.shared.createLabel(
-                withText: popupModel.disclosure,
-                style: popupStyle.disclosurePopupTextStyle, align: .left)
+        closeButton = PopupElements.shared.addCloseButton(
+            target: self, color: popupStyle.crossColor,
+            action: #selector(closeButtonTapped))
+        dividerTop = PopupElements.shared.createHorizontalDivider(
+            color: popupStyle.dividerColor)
+        dividerBottom = PopupElements.shared.createHorizontalDivider(
+            color: popupStyle.dividerColor)
+        titleLabel = PopupElements.shared.createLabel(
+            withText: popupModel.overlayTitle,
+            style: popupStyle.titlePopupTextStyle)
+        subtitleLabel = PopupElements.shared.createLabel(
+            withText: popupModel.overlaySubtitle,
+            style: popupStyle.subTitlePopupTextStyle)
+        disclosureLabel = PopupElements.shared.createLabel(
+            withText: popupModel.disclosure,
+            style: popupStyle.disclosurePopupTextStyle, align: .left)
 
-            dynamicParentProductView = PopupElements.shared.createContainerView(
-                backgroundColor: .white, borderColor: popupStyle.borderColor,
-                borderWidth: 1.0, cornerRadius: 8.0)
-            dynamicParentProductView.translatesAutoresizingMaskIntoConstraints =
-                false
+        dynamicParentProductView = PopupElements.shared.createContainerView(
+            backgroundColor: .white, borderColor: popupStyle.borderColor,
+            borderWidth: 1.0, cornerRadius: 8.0)
+        dynamicParentProductView.translatesAutoresizingMaskIntoConstraints =
+            false
 
-            headerLabel = PopupElements.shared.createLabel(
-                withText: popupModel.overlayContainerBarHeading,
-                style: popupStyle.headerPopupTextStyle)
-            headerView = UIView()
-            headerView.translatesAutoresizingMaskIntoConstraints = false
-            headerView.backgroundColor = popupStyle.headerBgColor
+        headerLabel = PopupElements.shared.createLabel(
+            withText: popupModel.overlayContainerBarHeading,
+            style: popupStyle.headerPopupTextStyle)
+        headerView = UIView()
+        headerView.translatesAutoresizingMaskIntoConstraints = false
+        headerView.backgroundColor = popupStyle.headerBgColor
 
-            if headerLabel.text?.isEmpty ?? true {
-                headerView.isHidden = true
+        if headerLabel.text?.isEmpty ?? true {
+            headerView.isHidden = true
+        }
+        dynamicChildProductView = PopupElements.shared.createStackView(
+            axis: .vertical, spacing: 10)
+
+        actionButton = PopupElements.shared.createButton(
+            target: self,
+            title: popupModel.primaryActionButtonAttributes?.buttonText
+                ?? "Action",
+            buttonStyle: placementsConfiguration?.popUpStyling?
+                .actionButtonStyle,
+            action: #selector(actionButtonTapped))
+
+        view.addSubview(popupView)
+
+        brandLogo = UIImageView()
+        brandLogo.translatesAutoresizingMaskIntoConstraints = false
+        brandLogo.contentMode = .scaleAspectFit
+        brandLogo.clipsToBounds = true
+        brandLogo.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        brandLogo.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+
+        overlayProductView = UIView()
+        overlayProductView.translatesAutoresizingMaskIntoConstraints = false
+
+        overlayEmbeddedView = UIView()
+        overlayEmbeddedView.translatesAutoresizingMaskIntoConstraints =
+            false
+
+        if let imageURL = URL(string: popupModel.brandLogoUrl) {
+            brandLogo.loadImage(from: imageURL) { success in
+                if success {} else {}
             }
-            dynamicChildProductView = PopupElements.shared.createStackView(
-                axis: .vertical, spacing: 10)
+        }
+        scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
 
-            actionButton = PopupElements.shared.createButton(
-                target: self,
-                title: popupModel.primaryActionButtonAttributes?.buttonText
-                    ?? "Action", buttonStyle: nil,
-                action: #selector(actionButtonTapped))
+        topRowView.addSubview(closeButton)
+        topRowView.addSubview(brandLogo)
+        topRowView.addSubview(dividerTop)
 
-            view.addSubview(popupView)
+        popupView.addSubview(topRowView)
 
-            brandLogo = UIImageView()
-            brandLogo.translatesAutoresizingMaskIntoConstraints = false
-            brandLogo.contentMode = .scaleAspectFit
-            brandLogo.clipsToBounds = true
-            brandLogo.setContentHuggingPriority(.defaultHigh, for: .vertical)
-            brandLogo.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-
-            overlayProductView = UIView()
-            overlayProductView.translatesAutoresizingMaskIntoConstraints = false
-
-            overlayEmbeddedView = UIView()
-            overlayEmbeddedView.translatesAutoresizingMaskIntoConstraints =
-                false
-
-            if let imageURL = URL(string: popupModel.brandLogoUrl) {
-                brandLogo.loadImage(from: imageURL) { success in
-                    if success {} else {}
-                }
-            }
-            scrollView = UIScrollView()
-            scrollView.translatesAutoresizingMaskIntoConstraints = false
-
-            topRowView.addSubview(closeButton)
-            topRowView.addSubview(brandLogo)
-            topRowView.addSubview(dividerTop)
-
-            popupView.addSubview(topRowView)
-
-            addSectionsToStackView(popupStyle: popupStyle)
+        addSectionsToStackView(popupStyle: popupStyle)
 
     }
 
     internal func setupEmbeddedOverlay() async {
         guard let webViewURL = URL(string: popupModel.webViewUrl) else {
-           await alertHandler.showAlert(
+            await alertHandler.showAlert(
                 title: Constants.nativeSDKAlertTitle(),
                 message: Constants.unableToLoadWebURL(
                     message: popupModel.webViewUrl),
@@ -450,7 +454,7 @@ extension PopupController {
         let containerFooter = bodyDivModel.first { key, value in
             return key.contains("footer")
         }
-        
+
         if bodyDivModel.isEmpty {
             dynamicParentProductView.isHidden = true
         } else {

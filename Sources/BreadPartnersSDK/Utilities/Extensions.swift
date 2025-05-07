@@ -57,10 +57,7 @@ extension UILabel {
         if let textColor = style.textColor {
             self.textColor = textColor
         }
-        
-        if let textSize = style.textSize {
-            self.font = self.font?.withSize(textSize)
-        }
+
     }
 }
 

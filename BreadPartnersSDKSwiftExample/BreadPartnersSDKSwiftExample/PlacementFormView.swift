@@ -115,6 +115,10 @@ struct PlacementFormView: View {
                         top: 5, leading: 0, bottom: 10, trailing: 0))
             }
 
+            DisclosureGroup("Popup Styling") {
+                DynamicPopupStyles(formData: $formData)
+            }
+            
             Section {
                 Button(action: {
                     hideKeyboard()
