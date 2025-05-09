@@ -23,6 +23,7 @@ class FormViewModel: ObservableObject {
         (BreadPartnerTextView, BreadPartnerButtonView)?
 
     @Published var overlayResponse: UIViewController?
+    @Published var overlayResponse2: UIViewController?
     @Published var isLoading = false
     @Published var error: Error?
 
@@ -201,6 +202,57 @@ class FormViewModel: ObservableObject {
                     switch event {
                     case .renderPopupView(let popupView):
                         self.overlayResponse = popupView
+                    case .sdkError(let error):
+                        self.logs += "\n" + error.localizedDescription
+                    case .onSDKEventLog(let logs):
+                        self.logs += "\n" + "\(logs)"
+                    default:
+                        break
+                    }
+                }
+
+            }
+        }
+    }
+    
+    func openExperienceForPlacement(formData: PlacementFormData) {
+        isLoading = true
+        textWithLinkResponse = nil
+        textWithButton = nil
+//        overlayResponse = nil
+        error = nil
+        logs = "No Logs"
+
+        Task {
+
+            await BreadPartnersSDK.shared.setup(
+                environment: BreadPartnersEnvironment.stage,
+                integrationKey: "217a0943-8031-457d-b9e3-7375c8af3a22",
+                enableLog: true
+            )
+
+            await BreadPartnersSDK.shared.openExperienceForPlacement(
+                merchantConfiguration: MerchantConfiguration(
+                    env: BreadPartnersEnvironment.stage,
+                    channel: "X",
+                    subchannel: "X"
+                ),
+                placementsConfiguration: PlacementConfiguration(
+                    placementData: PlacementData(
+                        placementId: "a0348301-dc9a-4c34-b68d-dacb40fe3696",
+                        domID: "", order: Order(
+                            totalPrice: CurrencyValue(
+                                currency: "USD", value: 0)
+                        )
+                    )
+                ),
+                forSwiftUI: true
+            ) { event in
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    switch event {
+                    case .renderPopupView(let popupView):
+                        self.overlayResponse2 = popupView
                     case .sdkError(let error):
                         self.logs += "\n" + error.localizedDescription
                     case .onSDKEventLog(let logs):

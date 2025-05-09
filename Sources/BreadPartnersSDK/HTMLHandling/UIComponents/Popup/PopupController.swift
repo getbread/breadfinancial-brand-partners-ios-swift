@@ -57,11 +57,6 @@ internal class PopupController: UIViewController,@preconcurrency AppRestartListe
     var merchantConfiguration: MerchantConfiguration?
     var placementsConfiguration: PlacementConfiguration?
     var brandConfiguration: BrandConfigResponse?
-    var recaptchaManager: RecaptchaManager
-    var apiClient: APIClient
-    var alertHandler: AlertHandler
-    var commonUtils: CommonUtils
-    let logger: Logger
 
     let callback: ((BreadPartnerEvents) -> Void)
 
@@ -71,12 +66,7 @@ internal class PopupController: UIViewController,@preconcurrency AppRestartListe
         placementConfiguration: PlacementConfiguration,
         popupModel: PopupPlacementModel,
         overlayType: PlacementOverlayType,
-        apiClient: APIClient,
-        alertHandler: AlertHandler,
-        commonUtils: CommonUtils,
         brandConfiguration: BrandConfigResponse?,
-        recaptchaManager: RecaptchaManager,
-        logger: Logger,
         callback: @escaping (BreadPartnerEvents) -> Void
     ) {
         self.integrationKey = integrationKey
@@ -85,18 +75,14 @@ internal class PopupController: UIViewController,@preconcurrency AppRestartListe
         self.brandConfiguration = brandConfiguration
         self.popupModel = popupModel
         self.overlayType = overlayType
-        self.apiClient = apiClient
-        self.alertHandler = alertHandler
-        self.commonUtils = commonUtils
-        self.recaptchaManager = recaptchaManager
-        self.logger = logger
         self.callback = callback
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
-        fatalError()
+        fatalError("init(coder:) has not been implemented")
     }
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -128,7 +114,6 @@ internal class PopupController: UIViewController,@preconcurrency AppRestartListe
 
         popupView.addSubview(overlayEmbeddedView)
         webViewManager = BreadFinancialWebViewInterstitial(
-            logger: logger,
             callback: { event in
                 self.handleWebViewEvent(event: event)
             })

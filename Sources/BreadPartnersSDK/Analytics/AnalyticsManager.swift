@@ -20,20 +20,6 @@ import UIKit
 @available(iOS 15, *)
 internal actor AnalyticsManager {
 
-    private let apiClient: APIClient
-    private let commonUtils: CommonUtils
-    private let dispatchQueue: DispatchQueue
-
-    init(
-        apiClient: APIClient,
-        commonUtils: CommonUtils,
-        dispatchQueue: DispatchQueue
-    ) {
-        self.apiClient = apiClient
-        self.commonUtils = commonUtils
-        self.dispatchQueue = dispatchQueue
-    }
-
     private var apiKey: String = ""
 
     func setApiKey(_ newApiKey: String) {
@@ -57,7 +43,7 @@ internal actor AnalyticsManager {
         ]
 
         do {
-            _ = try await apiClient.request(
+            _ = try await APIClient().request(
                 urlString: apiUrl, method: .OPTIONS, headers: headers,
                 body: payload)
         } catch {
@@ -67,7 +53,7 @@ internal actor AnalyticsManager {
     private func createAnalyticsPlacementPayload(
         name: String, placementResponse: PlacementsResponse
     ) async -> Analytics.Payload {
-        let timestamp = await commonUtils.getCurrentTimestamp()
+        let timestamp = await CommonUtils().getCurrentTimestamp()
 
         return await Analytics.Payload(
             name: name,
@@ -100,7 +86,7 @@ internal actor AnalyticsManager {
                 browserCtx: Analytics.BrowserCtx(
                     library: Analytics.Library(
                         name: "bread-partners-sdk-ios", version: "0.0.1"),
-                    userAgent: await commonUtils.getUserAgent(),
+                    userAgent: await CommonUtils().getUserAgent(),
                     page: Analytics.Page(
                         path: "ToDo",
                         url: nil

@@ -123,6 +123,7 @@ struct PlacementFormView: View {
                 Button(action: {
                     hideKeyboard()
                     viewModel.generatePlacements(formData: formData)
+//                    viewModel.openExperienceForPlacement(formData: formData)
                 }) {
                     Text("Generate Placement").frame(
                         maxWidth: .infinity, maxHeight: .infinity)
@@ -196,6 +197,10 @@ struct PlacementFormView: View {
             }
 
         }.onChange(of: viewModel.overlayResponse) {
+            oldPopupView, newPopupView in
+            guard let popup = newPopupView else { return }
+            presentPopup(popup)
+        }.onChange(of: viewModel.overlayResponse2) {
             oldPopupView, newPopupView in
             guard let popup = newPopupView else { return }
             presentPopup(popup)

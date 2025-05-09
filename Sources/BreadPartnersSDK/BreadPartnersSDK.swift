@@ -19,119 +19,15 @@ import UIKit
 public class BreadPartnersSDK: NSObject, UITextViewDelegate {
 
     public static var shared: BreadPartnersSDK = {
-         let instance = BreadPartnersSDK()
-         return instance
-     }()
+        let instance = BreadPartnersSDK()
+        return instance
+    }()
 
     var integrationKey: String = ""
-
-    var logger: Logger
-    var alertHandler: AlertHandler
-    var commonUtils: CommonUtils
-    var apiClient: APIClient
-    var recaptchaManager: RecaptchaManager
-    var analyticsManager: AnalyticsManager
-    var swiftSoupParser: SwiftSoupParser
-    var htmlContentParser: HTMLContentParser
-    var htmlContentRenderer: HTMLContentRenderer
-    var callback: @Sendable (BreadPartnerEvents) -> Void = { _ in }
-    var rtpsFlow: Bool = false
-    var openPlacementExperience: Bool = false
-    var prescreenId: Int? = nil
-    var splitTextAndAction: Bool = false
-    var forSwiftUI: Bool = false
-    
-    /// Step 2: Initialize dependencies after `super.init()`
-    private override init() {
-        self.logger = Logger()
-        self.alertHandler = AlertHandler(
-            windowScene: UIApplication.shared.connectedScenes.first as? UIWindowScene
-        )
-        self.commonUtils = CommonUtils(
-            dispatchQueue: .main,
-            alertHandler: self.alertHandler
-        )
-        self.apiClient = APIClient(
-            urlSession: URLSession.shared,
-            logger: self.logger,
-            commonUtils: self.commonUtils
-        )
-        self.recaptchaManager = RecaptchaManager(
-            logger: self.logger
-        )
-        self.analyticsManager = AnalyticsManager(
-            apiClient: self.apiClient,
-            commonUtils: self.commonUtils,
-            dispatchQueue: DispatchQueue.global(qos: .background)
-        )
-        self.swiftSoupParser = SwiftSoupParser()
-        self.htmlContentParser = HTMLContentParser(
-            htmlParser: self.swiftSoupParser
-        )
-        self.htmlContentRenderer = HTMLContentRenderer(
-            integrationKey: "",
-            apiClient: self.apiClient,
-            alertHandler: self.alertHandler,
-            commonUtils: self.commonUtils,
-            analyticsManager: self.analyticsManager,
-            logger: self.logger,
-            htmlContentParser: self.htmlContentParser,
-            dispatchQueue: DispatchQueue.main,
-            merchantConfiguration: self.merchantConfiguration,
-            placementsConfiguration: self.placementsConfiguration,
-            brandConfiguration: self.brandConfiguration,
-            recaptchaManager: self.recaptchaManager,
-            callback: self.callback
-        )
-    }
+    var isLoggingEnabled: Bool = false
 
     var sdkEnvironment: BreadPartnersEnvironment = .stage
-    var merchantConfiguration: MerchantConfiguration?
-    var placementsConfiguration: PlacementConfiguration?
     var brandConfiguration: BrandConfigResponse?
-    var onResult: ((BreadPartnerEvents) -> Void)?
-
-    func setUpInjectables() async {
-
-        self.logger.callback = callback
-        
-        if brandConfiguration == nil {
-            return callback(
-                .sdkError(
-                    error: NSError(
-                        domain:
-                            "Brand configurations are missing or unavailable.",
-                        code: 404)))
-        }
-        
-        if self.placementsConfiguration?.popUpStyling == nil {
-            self.placementsConfiguration?.popUpStyling = BreadPartnerDefaults.popupStyle
-        }
-
-        merchantConfiguration?.env = sdkEnvironment
-        
-        await alertHandler.setUpAlerts(rtpsFlow, logger, callback)
-
-        await analyticsManager.setApiKey(integrationKey)
-
-        self.htmlContentRenderer = HTMLContentRenderer(
-            integrationKey: integrationKey,
-            apiClient: self.apiClient,
-            alertHandler: self.alertHandler,
-            commonUtils: self.commonUtils,
-            analyticsManager: self.analyticsManager,
-            logger: self.logger,
-            htmlContentParser: self.htmlContentParser,
-            dispatchQueue: DispatchQueue.main,
-            merchantConfiguration: self.merchantConfiguration,
-            placementsConfiguration: self.placementsConfiguration,
-            brandConfiguration: self.brandConfiguration,
-            recaptchaManager: self.recaptchaManager,
-            splitTextAndAction: self.splitTextAndAction,
-            forSwiftUI: self.forSwiftUI,
-            callback: self.callback
-        )
-    }
 
     /// Call this function when the app launches.
     /// - Parameters:
@@ -144,9 +40,9 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
         enableLog: Bool
     ) async {
         await APIUrl.setEnvironment(environment)
-        sdkEnvironment = environment
+        self.sdkEnvironment = environment
         self.integrationKey = integrationKey
-        self.logger.isLoggingEnabled = enableLog
+        self.isLoggingEnabled = enableLog
         return await fetchBrandConfig()
     }
 
@@ -166,18 +62,20 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
             BreadPartnerEvents
         ) -> Void
     ) async {
-        self.merchantConfiguration = merchantConfiguration
-        self.placementsConfiguration = placementsConfiguration
-        self.splitTextAndAction = splitTextAndAction
-        self.forSwiftUI = forSwiftUI
-        self.callback = callback
-        self.rtpsFlow = false
-        self.openPlacementExperience = false
-
-        await setUpInjectables()
-
-        await fetchPlacementData()
-
+        var mutablePlacementsConfiguration = placementsConfiguration
+        
+        if mutablePlacementsConfiguration.popUpStyling == nil {
+            mutablePlacementsConfiguration.popUpStyling = BreadPartnerDefaults.popupStyle
+        }
+        
+        await fetchPlacementData(
+            merchantConfiguration: merchantConfiguration,
+            placementsConfiguration: mutablePlacementsConfiguration,
+            splitTextAndAction: splitTextAndAction,
+            openPlacementExperience: false,
+            forSwiftUI: forSwiftUI,
+            callback: callback
+        )
     }
 
     /// Calls this function to check if the user qualifies for a pre-screen card application.
@@ -201,18 +99,20 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
             BreadPartnerEvents
         ) -> Void
     ) async {
-        self.merchantConfiguration = merchantConfiguration
-        self.placementsConfiguration = placementsConfiguration
-        self.splitTextAndAction = splitTextAndAction
-        self.forSwiftUI = forSwiftUI
-        self.callback = callback
-        self.rtpsFlow = true
-        self.openPlacementExperience = false
-
-        await setUpInjectables()
-
+        var mutablePlacementsConfiguration = placementsConfiguration
+        
+        if mutablePlacementsConfiguration.popUpStyling == nil {
+            mutablePlacementsConfiguration.popUpStyling = BreadPartnerDefaults.popupStyle
+        }
+        
         //        await executeSecurityCheck()
-        await preScreenLookupCall(token: "\(UUID().uuidString)")
+        await preScreenLookupCall(
+            merchantConfiguration: merchantConfiguration,
+            placementsConfiguration: mutablePlacementsConfiguration,
+            splitTextAndAction: false, openPlacementExperience: false,
+            forSwiftUI: forSwiftUI,
+            callback: callback,
+            token: "\(UUID().uuidString)")
     }
 
     /// Display an overlay to the customer without requiring them to click on a placement to trigger it.
@@ -229,17 +129,17 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
             BreadPartnerEvents
         ) -> Void
     ) async {
-        self.merchantConfiguration = merchantConfiguration
-        self.placementsConfiguration = placementsConfiguration
-        self.forSwiftUI = forSwiftUI
-        self.callback = callback
-        self.rtpsFlow = false
-        self.openPlacementExperience = true
-
-        await setUpInjectables()
-
-        await fetchPlacementData()
-
+        var mutablePlacementsConfiguration = placementsConfiguration
+        
+        if mutablePlacementsConfiguration.popUpStyling == nil {
+            mutablePlacementsConfiguration.popUpStyling = BreadPartnerDefaults.popupStyle
+        }
+        await fetchPlacementData(
+            merchantConfiguration: merchantConfiguration,
+            placementsConfiguration: mutablePlacementsConfiguration,
+            splitTextAndAction: false, openPlacementExperience: true,
+            forSwiftUI: false,
+            callback: callback
+        )
     }
-
 }

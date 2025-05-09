@@ -127,18 +127,22 @@ extension PopupController {
 
     internal func setupEmbeddedOverlay() async {
         guard let webViewURL = URL(string: popupModel.webViewUrl) else {
-            await alertHandler.showAlert(
-                title: Constants.nativeSDKAlertTitle(),
-                message: Constants.unableToLoadWebURL(
-                    message: popupModel.webViewUrl),
-                showOkButton: true
-            )
+            return callback(
+                .sdkError(
+                    error: NSError(
+                        domain: "", code: 500,
+                        userInfo: [
+                            NSLocalizedDescriptionKey:
+                                Constants
+                                .unableToLoadWebURL(
+                                    message: popupModel.webViewUrl)
+                        ])))
             return
         }
 
         await MainActor.run {
             popupView.addSubview(overlayEmbeddedView)
-            webViewManager = BreadFinancialWebViewInterstitial(logger: logger) {
+            webViewManager = BreadFinancialWebViewInterstitial {
                 [weak self] event in
                 self?.handleWebViewEvent(event: event)
             }
@@ -154,14 +158,16 @@ extension PopupController {
         do {
             await MainActor.run { loader?.startAnimating() }
             let loadedURL = try await webViewManager.loadPage(for: webView)
-            logger.printLog("Loaded URL: \(loadedURL)")
+            Logger().printLog("Loaded URL: \(loadedURL)")
         } catch {
-            await alertHandler.showAlert(
-                title: Constants.nativeSDKAlertTitle(),
-                message: Constants.unableToLoadWebURL(
-                    message: error.localizedDescription),
-                showOkButton: true
-            )
+            return callback(
+                .sdkError(
+                    error: NSError(
+                        domain: "", code: 500,
+                        userInfo: [
+                            NSLocalizedDescriptionKey: Constants.apiError(
+                                message: error.localizedDescription)
+                        ])))
         }
 
         await MainActor.run { loader?.stopAnimating() }

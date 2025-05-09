@@ -24,17 +24,6 @@ internal enum HTTPMethod: String, Sendable {
 @available(iOS 15, *)
 internal class APIClient: @unchecked Sendable {
 
-    private let urlSession: URLSession
-    private let logger: Logger
-    private let commonUtils: CommonUtils
-
-    // Dependency Injection through the initializer
-    init(urlSession: URLSession, logger: Logger, commonUtils: CommonUtils) {
-        self.urlSession = urlSession
-        self.logger = logger
-        self.commonUtils = commonUtils
-    }
-
     /// Generic API call function
     ///
     /// - Parameters:
@@ -65,7 +54,7 @@ internal class APIClient: @unchecked Sendable {
 
         let genericHeader: [String: String] = await [
             Constants.headerContentType: Constants.headerContentTypeValue,
-            Constants.headerUserAgentKey: commonUtils.getUserAgent(),
+            Constants.headerUserAgentKey: CommonUtils().getUserAgent(),
             Constants.headerOriginKey: Constants.headerOriginValue,
         ]
 
@@ -113,13 +102,13 @@ internal class APIClient: @unchecked Sendable {
         }
 
         // Log the request details
-        logger.logRequestDetails(
+        Logger().logRequestDetails(
             url: url,
             method: method.rawValue,
             headers: updatedHeaders,
             body: request.httpBody)
 
-        let (data, response) = try await urlSession.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw NSError(
@@ -129,7 +118,7 @@ internal class APIClient: @unchecked Sendable {
                 ])
         }
 
-        logger.logResponseDetails(
+        Logger().logResponseDetails(
             url: url, statusCode: httpResponse.statusCode,
             headers: httpResponse.allHeaderFields, body: data)
 

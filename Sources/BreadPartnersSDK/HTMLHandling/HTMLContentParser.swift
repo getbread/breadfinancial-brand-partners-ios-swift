@@ -13,26 +13,14 @@
 import Foundation
 @preconcurrency import SwiftSoup
 
-/// Parses HTML content into a SwiftSoup Document.
-internal actor SwiftSoupParser {
-    func parse(_ htmlContent: String) async throws -> Document {
-        return try SwiftSoup.parse(htmlContent)
-    }
-}
 
 /// Actor responsible for extracting structured data from HTML using SwiftSoup.
 internal actor HTMLContentParser {
-
-    private let htmlParser: SwiftSoupParser
-
-    init(htmlParser: SwiftSoupParser = SwiftSoupParser()) {
-        self.htmlParser = htmlParser
-    }
-
+    
     func extractTextPlacementModel(htmlContent: String) async throws
         -> TextPlacementModel?
     {
-        let document = try await htmlParser.parse(htmlContent)
+        let document = try await SwiftSoup.parse(htmlContent)
 
         // Extract attributes
         let actionContentId = try document.select("[data-action-content-id]")

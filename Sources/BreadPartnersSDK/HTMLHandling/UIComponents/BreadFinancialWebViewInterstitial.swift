@@ -19,16 +19,13 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
 {
 
     init(
-        logger:Logger,
         callback: @escaping (BreadPartnerEvents) -> Void
     ) {
-        self.logger = logger
         self.callback = callback
     }
 
     var onPageLoadCompleted: ((Result<URL, Error>) -> Void)?
 
-    let logger: Logger
     let callback: ((BreadPartnerEvents) -> Void)
     var appRestartListener: AppRestartListener?
     
@@ -99,7 +96,7 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
                 if let payload = action["payload"] as? String {
                     onAppRestartClicked(url: "\(payload)")
                 }else {
-                    logger.printLog("Issue in restarting application")
+                    Logger().printLog("Issue in restarting application")
                 }
                 
             case "AnchorTags":
@@ -121,8 +118,8 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
             case "LOAD_ADOBE_TRACKING_ID":
                 if let payload = action["payload"] as? [String: Any] {
                     if let adobeTrackingId = payload["adobeTrackingId"] {
-                        if(logger.isLoggingEnabled){
-                            logger.printLog("BreadPartnersSDK: AdobeTrackingID: \(adobeTrackingId)")
+                        if(Logger().isLoggingEnabled){
+                            Logger().printLog("BreadPartnersSDK: AdobeTrackingID: \(adobeTrackingId)")
                         }
                     }
                 }
@@ -141,7 +138,7 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
                 
             case "RECEIVE_APPLICATION_RESULT":
                 if let payload = action["payload"] as? [String: Any] {
-                    logger.logApplicationResultDetails(payload)
+                    Logger().logApplicationResultDetails(payload)
                     callback(.webViewSuccess(result: payload))
                 }
                 

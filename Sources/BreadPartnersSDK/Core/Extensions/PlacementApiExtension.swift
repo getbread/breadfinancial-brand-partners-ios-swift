@@ -10,6 +10,8 @@
 //  © 2025 Bread Financial
 //------------------------------------------------------------------------------
 
+import Foundation
+
 @available(iOS 15, *)
 extension BreadPartnersSDK {
 
@@ -18,24 +20,27 @@ extension BreadPartnersSDK {
         let apiUrl = APIUrl(urlType: .brandConfig(brandId: integrationKey)).url
 
         do {
-            let response = try await apiClient.request(
+            let response = try await APIClient().request(
                 urlString: apiUrl, method: .GET, body: nil)
-            brandConfiguration = try await commonUtils.decodeJSON(
+            brandConfiguration = try await CommonUtils().decodeJSON(
                 from: response, to: BrandConfigResponse.self)
             return
         } catch {
-            await alertHandler.showAlert(
-                title: Constants.nativeSDKAlertTitle(),
-                message: Constants.apiError(
-                    message: error.localizedDescription),
-                showOkButton: true
-            )
         }
     }
 
     /// This method is called to fetch placement data,
     /// which will be displayed as a text view with a clickable button in the brand partner's UI.
-    internal func fetchPlacementData() async {
+    internal func fetchPlacementData(
+        merchantConfiguration: MerchantConfiguration,
+        placementsConfiguration: PlacementConfiguration,
+        splitTextAndAction: Bool = false,
+        openPlacementExperience: Bool = false,
+        forSwiftUI: Bool = false,
+        callback: @Sendable @escaping (
+            BreadPartnerEvents
+        ) -> Void
+    ) async {
         do {
             let apiUrl = APIUrl(urlType: .generatePlacements).url
             var request: Any? = nil
@@ -43,29 +48,48 @@ extension BreadPartnersSDK {
             let builder = PlacementRequestBuilder(
                 integrationKey: integrationKey,
                 merchantConfiguration: merchantConfiguration,
-                placementConfig: placementsConfiguration?.placementData,
+                placementConfig: placementsConfiguration.placementData,
                 environment: APIUrl.currentEnvironment
             )
             request = builder.build()
 
-            let response = try await apiClient.request(
+            let response = try await APIClient().request(
                 urlString: apiUrl, method: .POST, body: request
             )
-            await handlePlacementResponse(response)
+            await handlePlacementResponse(
+                response,
+                merchantConfiguration: merchantConfiguration,
+                placementsConfiguration: placementsConfiguration,
+                splitTextAndAction: splitTextAndAction,
+                openPlacementExperience: openPlacementExperience,
+                forSwiftUI: forSwiftUI,
+                callback: callback)
         } catch {
-            await alertHandler.showAlert(
-                title: Constants.nativeSDKAlertTitle(),
-                message: Constants.apiError(
-                    message: error.localizedDescription),
-                showOkButton: true
-            )
+            return callback(
+                .sdkError(
+                    error: NSError(
+                        domain: "", code: 500,
+                        userInfo: [
+                            NSLocalizedDescriptionKey: Constants.apiError(
+                                message: error.localizedDescription)
+                        ])))
         }
     }
 
-    internal func handlePlacementResponse(_ response: AnySendable) async {
+    internal func handlePlacementResponse(
+        _ response: AnySendable,
+        merchantConfiguration: MerchantConfiguration,
+        placementsConfiguration: PlacementConfiguration,
+        splitTextAndAction: Bool = false,
+        openPlacementExperience: Bool = false,
+        forSwiftUI: Bool = false,
+        callback: @Sendable @escaping (
+            BreadPartnerEvents
+        ) -> Void
+    ) async {
         do {
             let responseModel: PlacementsResponse =
-                try await commonUtils.decodeJSON(
+                try await CommonUtils().decodeJSON(
                     from: response,
                     to: PlacementsResponse.self
                 )
@@ -73,7 +97,7 @@ extension BreadPartnersSDK {
             /// Opens the overlay automatically to simulate user behavior of manually tapping the placement.
             if openPlacementExperience {
                 let responseModel: PlacementsResponse =
-                    try await commonUtils.decodeJSON(
+                    try await CommonUtils().decodeJSON(
                         from: response, to: PlacementsResponse.self)
                 guard
                     let popupPlacementHTMLContent = responseModel
@@ -86,15 +110,25 @@ extension BreadPartnersSDK {
                                 ?? ""
                         )
                 else {
-                    await alertHandler.showAlert(
-                        title: Constants.nativeSDKAlertTitle(),
-                        message: Constants.popupPlacementParsingError,
-                        showOkButton: true
-                    )
-                    return
+                    return callback(
+                        .sdkError(
+                            error: NSError(
+                                domain: "", code: 500,
+                                userInfo: [
+                                    NSLocalizedDescriptionKey: Constants
+                                        .popupPlacementParsingError
+                                ])))
                 }
 
-                await htmlContentRenderer.createPopupOverlay(
+                await HTMLContentRenderer(
+                    integrationKey: integrationKey,
+                    merchantConfiguration: merchantConfiguration,
+                    placementsConfiguration: placementsConfiguration,
+                    brandConfiguration: brandConfiguration,
+                    splitTextAndAction: splitTextAndAction,
+                    forSwiftUI: forSwiftUI,
+                    callback: callback
+                ).createPopupOverlay(
                     popupPlacementModel: popupPlacementModel,
                     overlayType: .embeddedOverlay
                 )
@@ -102,19 +136,29 @@ extension BreadPartnersSDK {
             } else {
                 /// Handles the text placement UI that will be rendered on the brand partner's app screen
                 /// for manual tap behavior.
-                await htmlContentRenderer.handleTextPlacement(
+                await HTMLContentRenderer(
+                    integrationKey: integrationKey,
+                    merchantConfiguration: merchantConfiguration,
+                    placementsConfiguration: placementsConfiguration,
+                    brandConfiguration: brandConfiguration,
+                    splitTextAndAction: splitTextAndAction,
+                    forSwiftUI: forSwiftUI,
+                    callback: callback
+                ).handleTextPlacement(
                     responseModel: responseModel
                 )
 
             }
 
         } catch {
-            await alertHandler.showAlert(
-                title: Constants.nativeSDKAlertTitle(),
-                message: Constants.catchError(
-                    message: error.localizedDescription),
-                showOkButton: true
-            )
+            return callback(
+                .sdkError(
+                    error: NSError(
+                        domain: "", code: 500,
+                        userInfo: [
+                            NSLocalizedDescriptionKey: Constants.apiError(
+                                message: error.localizedDescription)
+                        ])))
         }
     }
 }

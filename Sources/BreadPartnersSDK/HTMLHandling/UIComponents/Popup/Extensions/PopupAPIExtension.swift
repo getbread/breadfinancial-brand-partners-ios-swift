@@ -13,7 +13,7 @@
 import Foundation
 
 @available(iOS 15, *)
-internal extension PopupController {
+extension PopupController {
 
     /// Fetches the web view placement data asynchronously by constructing a placement request and calling the API.
     internal func fetchWebViewPlacement() async {
@@ -23,7 +23,7 @@ internal extension PopupController {
             placementConfig: placementsConfiguration?.placementData,
             environment: APIUrl.currentEnvironment)
         let placementRequest = builder.build()
-        
+
         let request = PlacementRequest(
             placements: [
                 PlacementRequestBody(
@@ -41,16 +41,18 @@ internal extension PopupController {
     internal func fetchData(requestBody: AnySendable) async {
         let apiUrl = APIUrl(urlType: .generatePlacements).url
         do {
-            let response = try await apiClient.request(
+            let response = try await APIClient().request(
                 urlString: apiUrl, method: .POST, body: requestBody)
             await handleResponse(response)
         } catch {
-            await  alertHandler.showAlert(
-                title: Constants.nativeSDKAlertTitle(),
-                message: Constants.apiError(
-                    message: error.localizedDescription),
-                showOkButton: true
-            )
+            return callback(
+                .sdkError(
+                    error: NSError(
+                        domain: "", code: 500,
+                        userInfo: [
+                            NSLocalizedDescriptionKey: Constants.apiError(
+                                message: error.localizedDescription)
+                        ])))
         }
     }
 
@@ -58,7 +60,7 @@ internal extension PopupController {
     internal func handleResponse(_ response: AnySendable) async {
         do {
             let responseModel: PlacementsResponse =
-                try await commonUtils.decodeJSON(
+                try await CommonUtils().decodeJSON(
                     from: response, to: PlacementsResponse.self)
             guard
                 let popupPlacementHTMLContent = responseModel.placementContent?
@@ -69,22 +71,27 @@ internal extension PopupController {
                             ?? ""
                     )
             else {
-                await alertHandler.showAlert(
-                    title: Constants.nativeSDKAlertTitle(),
-                    message: Constants.popupPlacementParsingError,
-                    showOkButton: true
-                )
-                return
+
+                return callback(
+                    .sdkError(
+                        error: NSError(
+                            domain: "", code: 500,
+                            userInfo: [
+                                NSLocalizedDescriptionKey: Constants
+                                    .popupPlacementParsingError
+                            ])))
             }
 
             self.webViewPlacementModel = popupPlacementModel
         } catch {
-            await alertHandler.showAlert(
-                title: Constants.nativeSDKAlertTitle(),
-                message: Constants.catchError(
-                    message: error.localizedDescription),
-                showOkButton: true
-            )
+            return callback(
+                .sdkError(
+                    error: NSError(
+                        domain: "", code: 500,
+                        userInfo: [
+                            NSLocalizedDescriptionKey: Constants.apiError(
+                                message: error.localizedDescription)
+                        ])))
         }
     }
 

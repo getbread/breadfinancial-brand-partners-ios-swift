@@ -48,7 +48,7 @@ extension HTMLContentRenderer {
             actionLink = contentText
             contentText = ""
         }
-        
+        print("FORSWIFT\(forSwiftUI)")
         if forSwiftUI {
             let combinedText = contentText + actionLink
             let swiftUIView = BreadPartnerLinkTextSwitUI(
@@ -102,7 +102,7 @@ extension HTMLContentRenderer {
             return
         }
 
-        if let actionType = await htmlContentParser.handleActionType(
+        if let actionType = await HTMLContentParser().handleActionType(
             from: placementModel.actionType ?? "")
         {
             switch actionType {
@@ -113,15 +113,25 @@ extension HTMLContentRenderer {
             case .noAction:
                 callback(.textClicked)
             default:
-                return await  alertHandler.showAlert(
-                    title: Constants.nativeSDKAlertTitle(),
-                    message: Constants.missingTextPlacementError,
-                    showOkButton: true)
+
+                return callback(
+                    .sdkError(
+                        error: NSError(
+                            domain: "", code: 500,
+                            userInfo: [
+                                NSLocalizedDescriptionKey: Constants
+                                    .missingTextPlacementError
+                            ])))
             }
         } else {
-            return await alertHandler.showAlert(
-                title: Constants.nativeSDKAlertTitle(),
-                message: Constants.noTextPlacementError, showOkButton: true)
+            return callback(
+                .sdkError(
+                    error: NSError(
+                        domain: "", code: 500,
+                        userInfo: [
+                            NSLocalizedDescriptionKey: Constants
+                                .noTextPlacementError
+                        ])))
         }
     }
 
