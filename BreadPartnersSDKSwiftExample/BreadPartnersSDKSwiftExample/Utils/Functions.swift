@@ -22,7 +22,11 @@ func presentPopup(_ popup: UIViewController) {
     popup.modalPresentationStyle = .overFullScreen
     popup.modalTransitionStyle = .crossDissolve
 
-    rootVC.present(popup, animated: true)
+    if let presentedVC = rootVC.presentedViewController {
+        presentedVC.present(popup, animated: true)
+    } else {
+        rootVC.present(popup, animated: true)
+    }
 }
 
 func hideKeyboard() {
