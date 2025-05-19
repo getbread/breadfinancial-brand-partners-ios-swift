@@ -20,6 +20,14 @@ import UIKit
 @available(iOS 15, *)
 internal actor AnalyticsManager {
 
+    init(
+        logger: Logger
+    ) {
+        self.logger = logger
+    }
+
+    var logger: Logger = Logger()
+    
     private var apiKey: String = ""
 
     func setApiKey(_ newApiKey: String) {
@@ -43,7 +51,7 @@ internal actor AnalyticsManager {
         ]
 
         do {
-            _ = try await APIClient().request(
+            _ = try await APIClient(logger: logger).request(
                 urlString: apiUrl, method: .OPTIONS, headers: headers,
                 body: payload)
         } catch {

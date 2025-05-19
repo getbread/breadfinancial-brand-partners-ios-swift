@@ -20,7 +20,7 @@ extension BreadPartnersSDK {
         let apiUrl = APIUrl(urlType: .brandConfig(brandId: integrationKey)).url
 
         do {
-            let response = try await APIClient().request(
+            let response = try await APIClient(logger: Logger()).request(
                 urlString: apiUrl, method: .GET, body: nil)
             brandConfiguration = try await CommonUtils().decodeJSON(
                 from: response, to: BrandConfigResponse.self)
@@ -37,6 +37,7 @@ extension BreadPartnersSDK {
         splitTextAndAction: Bool = false,
         openPlacementExperience: Bool = false,
         forSwiftUI: Bool = false,
+        logger: Logger,
         callback: @Sendable @escaping (
             BreadPartnerEvents
         ) -> Void
@@ -53,7 +54,7 @@ extension BreadPartnersSDK {
             )
             request = builder.build()
 
-            let response = try await APIClient().request(
+            let response = try await APIClient(logger: logger).request(
                 urlString: apiUrl, method: .POST, body: request
             )
             await handlePlacementResponse(
@@ -63,6 +64,7 @@ extension BreadPartnersSDK {
                 splitTextAndAction: splitTextAndAction,
                 openPlacementExperience: openPlacementExperience,
                 forSwiftUI: forSwiftUI,
+                logger: logger,
                 callback: callback)
         } catch {
             return callback(
@@ -83,6 +85,7 @@ extension BreadPartnersSDK {
         splitTextAndAction: Bool = false,
         openPlacementExperience: Bool = false,
         forSwiftUI: Bool = false,
+        logger: Logger,
         callback: @Sendable @escaping (
             BreadPartnerEvents
         ) -> Void
@@ -127,6 +130,7 @@ extension BreadPartnersSDK {
                     brandConfiguration: brandConfiguration,
                     splitTextAndAction: splitTextAndAction,
                     forSwiftUI: forSwiftUI,
+                    logger: logger,
                     callback: callback
                 ).createPopupOverlay(
                     popupPlacementModel: popupPlacementModel,
@@ -143,6 +147,7 @@ extension BreadPartnersSDK {
                     brandConfiguration: brandConfiguration,
                     splitTextAndAction: splitTextAndAction,
                     forSwiftUI: forSwiftUI,
+                    logger: logger,
                     callback: callback
                 ).handleTextPlacement(
                     responseModel: responseModel

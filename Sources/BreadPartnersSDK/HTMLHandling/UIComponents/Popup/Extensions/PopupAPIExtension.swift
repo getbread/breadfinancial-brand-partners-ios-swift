@@ -41,7 +41,7 @@ extension PopupController {
     internal func fetchData(requestBody: AnySendable) async {
         let apiUrl = APIUrl(urlType: .generatePlacements).url
         do {
-            let response = try await APIClient().request(
+            let response = try await APIClient(logger: logger).request(
                 urlString: apiUrl, method: .POST, body: requestBody)
             await handleResponse(response)
         } catch {

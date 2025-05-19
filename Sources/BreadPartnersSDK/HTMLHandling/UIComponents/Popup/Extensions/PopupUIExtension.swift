@@ -142,7 +142,7 @@ extension PopupController {
 
         await MainActor.run {
             popupView.addSubview(overlayEmbeddedView)
-            webViewManager = BreadFinancialWebViewInterstitial {
+            webViewManager = BreadFinancialWebViewInterstitial(logger: logger) {
                 [weak self] event in
                 self?.handleWebViewEvent(event: event)
             }
@@ -158,7 +158,7 @@ extension PopupController {
         do {
             await MainActor.run { loader?.startAnimating() }
             let loadedURL = try await webViewManager.loadPage(for: webView)
-            Logger().printLog("Loaded URL: \(loadedURL)")
+            logger.printLog("Loaded URL: \(loadedURL)")
         } catch {
             return callback(
                 .sdkError(

@@ -19,13 +19,16 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
 {
 
     init(
+        logger: Logger,
         callback: @escaping (BreadPartnerEvents) -> Void
     ) {
+        self.logger = logger
         self.callback = callback
     }
 
     var onPageLoadCompleted: ((Result<URL, Error>) -> Void)?
 
+    var logger: Logger = Logger()
     let callback: ((BreadPartnerEvents) -> Void)
     var appRestartListener: AppRestartListener?
     
@@ -47,7 +50,7 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
 
         webView.navigationDelegate = self
 
-        Logger().logLoadingURL(url: url)
+        logger.logLoadingURL(url: url)
         let request = URLRequest(url: url)
         webView.load(request)
 
@@ -96,7 +99,7 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
                 if let payload = action["payload"] as? String {
                     onAppRestartClicked(url: "\(payload)")
                 }else {
-                    Logger().printLog("Issue in restarting application")
+                    logger.printLog("Issue in restarting application")
                 }
                 
             case "AnchorTags":
@@ -118,8 +121,8 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
             case "LOAD_ADOBE_TRACKING_ID":
                 if let payload = action["payload"] as? [String: Any] {
                     if let adobeTrackingId = payload["adobeTrackingId"] {
-                        if(Logger().isLoggingEnabled){
-                            Logger().printLog("BreadPartnersSDK: AdobeTrackingID: \(adobeTrackingId)")
+                        if(logger.isLoggingEnabled){
+                            logger.printLog("BreadPartnersSDK: AdobeTrackingID: \(adobeTrackingId)")
                         }
                     }
                 }
@@ -138,7 +141,7 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
                 
             case "RECEIVE_APPLICATION_RESULT":
                 if let payload = action["payload"] as? [String: Any] {
-                    Logger().logApplicationResultDetails(payload)
+                    logger.logApplicationResultDetails(payload)
                     callback(.webViewSuccess(result: payload))
                 }
                 

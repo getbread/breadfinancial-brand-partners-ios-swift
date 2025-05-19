@@ -26,6 +26,7 @@ internal class HTMLContentRenderer {
     var splitTextAndAction: Bool = false
     var forSwiftUI: Bool = false
 
+    var logger: Logger = Logger()
     let callback: ((BreadPartnerEvents) -> Void)
 
     init(
@@ -35,6 +36,7 @@ internal class HTMLContentRenderer {
         brandConfiguration: BrandConfigResponse?,
         splitTextAndAction: Bool = false,
         forSwiftUI: Bool = false,
+        logger: Logger,
         callback: @escaping ((BreadPartnerEvents) -> Void)
     ) {
         self.integrationKey = integrationKey
@@ -43,6 +45,7 @@ internal class HTMLContentRenderer {
         self.brandConfiguration = brandConfiguration
         self.splitTextAndAction = splitTextAndAction
         self.forSwiftUI = forSwiftUI
+        self.logger = logger
         self.callback = callback
     }
 
@@ -85,9 +88,9 @@ internal class HTMLContentRenderer {
             textPlacementModel = parseTextPlacementModel
             guard let textPlacementModel = textPlacementModel else { return }
 
-            Logger().logTextPlacementModelDetails(textPlacementModel)
+            logger.logTextPlacementModelDetails(textPlacementModel)
             Task {
-                await AnalyticsManager().sendViewPlacement(
+                await AnalyticsManager(logger: logger).sendViewPlacement(
                     placementResponse: responseModel)
             }
 
@@ -134,7 +137,7 @@ internal class HTMLContentRenderer {
                         ])))
         }
 
-        Logger().logPopupPlacementModelDetails(popupPlacementModel)
+        logger.logPopupPlacementModelDetails(popupPlacementModel)
 
         guard
             let overlayType = await HTMLContentParser().handleOverlayType(
@@ -152,7 +155,7 @@ internal class HTMLContentRenderer {
         }
 
         Task {
-            await AnalyticsManager().sendClickPlacement(
+            await AnalyticsManager(logger: logger).sendClickPlacement(
                 placementResponse: responseModel)
         }
         await createPopupOverlay(
@@ -170,6 +173,7 @@ internal class HTMLContentRenderer {
             popupModel: popupPlacementModel,
             overlayType: overlayType,
             brandConfiguration: brandConfiguration,
+            logger:logger,
             callback: callback
         )
         configurePopupPresentation(popupViewController)

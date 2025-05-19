@@ -58,6 +58,7 @@ internal class PopupController: UIViewController,@preconcurrency AppRestartListe
     var placementsConfiguration: PlacementConfiguration?
     var brandConfiguration: BrandConfigResponse?
 
+    var logger: Logger = Logger()
     let callback: ((BreadPartnerEvents) -> Void)
 
     init(
@@ -67,6 +68,7 @@ internal class PopupController: UIViewController,@preconcurrency AppRestartListe
         popupModel: PopupPlacementModel,
         overlayType: PlacementOverlayType,
         brandConfiguration: BrandConfigResponse?,
+        logger: Logger,
         callback: @escaping (BreadPartnerEvents) -> Void
     ) {
         self.integrationKey = integrationKey
@@ -75,6 +77,7 @@ internal class PopupController: UIViewController,@preconcurrency AppRestartListe
         self.brandConfiguration = brandConfiguration
         self.popupModel = popupModel
         self.overlayType = overlayType
+        self.logger = logger
         self.callback = callback
         super.init(nibName: nil, bundle: nil)
     }
@@ -114,7 +117,7 @@ internal class PopupController: UIViewController,@preconcurrency AppRestartListe
 
         popupView.addSubview(overlayEmbeddedView)
         webViewManager = BreadFinancialWebViewInterstitial(
-            callback: { event in
+            logger: logger, callback: { event in
                 self.handleWebViewEvent(event: event)
             })
         webViewManager.appRestartListener = self

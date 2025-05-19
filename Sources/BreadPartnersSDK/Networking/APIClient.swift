@@ -24,6 +24,14 @@ internal enum HTTPMethod: String, Sendable {
 @available(iOS 15, *)
 internal class APIClient: @unchecked Sendable {
 
+    init(
+        logger: Logger
+    ) {
+        self.logger = logger
+    }
+
+    var logger: Logger = Logger()
+    
     /// Generic API call function
     ///
     /// - Parameters:
@@ -102,7 +110,7 @@ internal class APIClient: @unchecked Sendable {
         }
 
         // Log the request details
-        Logger().logRequestDetails(
+        logger.logRequestDetails(
             url: url,
             method: method.rawValue,
             headers: updatedHeaders,
@@ -118,7 +126,7 @@ internal class APIClient: @unchecked Sendable {
                 ])
         }
 
-        Logger().logResponseDetails(
+        logger.logResponseDetails(
             url: url, statusCode: httpResponse.statusCode,
             headers: httpResponse.allHeaderFields, body: data)
 

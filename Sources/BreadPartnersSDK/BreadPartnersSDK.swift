@@ -68,12 +68,17 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
             mutablePlacementsConfiguration.popUpStyling = BreadPartnerDefaults.popupStyle
         }
         
+        let logger = Logger()
+        logger.setLogging(enabled: isLoggingEnabled)
+        logger.setCallback(callback)
+        
         await fetchPlacementData(
             merchantConfiguration: merchantConfiguration,
             placementsConfiguration: mutablePlacementsConfiguration,
             splitTextAndAction: splitTextAndAction,
             openPlacementExperience: false,
             forSwiftUI: forSwiftUI,
+            logger: logger,
             callback: callback
         )
     }
@@ -105,12 +110,17 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
             mutablePlacementsConfiguration.popUpStyling = BreadPartnerDefaults.popupStyle
         }
         
+        let logger = Logger()
+        logger.setLogging(enabled: isLoggingEnabled)
+        logger.setCallback(callback)
+            
         //        await executeSecurityCheck()
         await preScreenLookupCall(
             merchantConfiguration: merchantConfiguration,
             placementsConfiguration: mutablePlacementsConfiguration,
             splitTextAndAction: false, openPlacementExperience: false,
             forSwiftUI: forSwiftUI,
+            logger: logger,
             callback: callback,
             token: "\(UUID().uuidString)")
     }
@@ -134,11 +144,17 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
         if mutablePlacementsConfiguration.popUpStyling == nil {
             mutablePlacementsConfiguration.popUpStyling = BreadPartnerDefaults.popupStyle
         }
+        
+        let logger = Logger()
+        logger.setLogging(enabled: isLoggingEnabled)
+        logger.setCallback(callback)
+            
         await fetchPlacementData(
             merchantConfiguration: merchantConfiguration,
             placementsConfiguration: mutablePlacementsConfiguration,
             splitTextAndAction: false, openPlacementExperience: true,
             forSwiftUI: false,
+            logger: logger,
             callback: callback
         )
     }

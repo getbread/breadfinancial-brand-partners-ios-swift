@@ -43,6 +43,7 @@ extension BreadPartnersSDK {
         splitTextAndAction: Bool = false,
         openPlacementExperience: Bool = false,
         forSwiftUI: Bool = false,
+        logger: Logger,
         callback: @Sendable @escaping (
             BreadPartnerEvents
         ) -> Void,
@@ -69,7 +70,7 @@ extension BreadPartnersSDK {
 
             let rtpsRequestBuilt = requestBuilder.build()
 
-            let response = try await APIClient().request(
+            let response = try await APIClient(logger: logger).request(
                 urlString: apiUrl,
                 method: .POST,
                 headers: headers,
@@ -85,7 +86,7 @@ extension BreadPartnersSDK {
                 from: returnResultType ?? "10")
             placementsConfiguration.rtpsData!.prescreenId =
                 preScreenLookupResponse.prescreenId
-            Logger().printLog("PreScreenID:Result: \(prescreenResult )")
+            logger.printLog("PreScreenID:Result: \(prescreenResult )")
 
             /// Since this call runs in the background without user interaction,
             /// if the result is not "approved" or prescreenId is nill,
@@ -102,6 +103,7 @@ extension BreadPartnersSDK {
                 splitTextAndAction: splitTextAndAction,
                 openPlacementExperience: openPlacementExperience,
                 forSwiftUI: forSwiftUI,
+                logger: logger,
                 callback: callback)
 
         } catch {
@@ -124,6 +126,7 @@ extension BreadPartnersSDK {
         splitTextAndAction: Bool = false,
         openPlacementExperience: Bool = false,
         forSwiftUI: Bool = false,
+        logger: Logger,
         callback: @Sendable @escaping (
             BreadPartnerEvents
         ) -> Void
@@ -150,7 +153,7 @@ extension BreadPartnersSDK {
                 ], brandId: integrationKey
             )
 
-            let response = try await APIClient().request(
+            let response = try await APIClient(logger: logger).request(
                 urlString: apiUrl, method: .POST, body: request
             )
             await handleRTPSPlacementResponse(
@@ -158,6 +161,7 @@ extension BreadPartnersSDK {
                 placementsConfiguration: placementsConfiguration,
                 splitTextAndAction: false, openPlacementExperience: true,
                 forSwiftUI: false,
+                logger: logger,
                 callback: callback,
                 response)
         } catch {
@@ -178,6 +182,7 @@ extension BreadPartnersSDK {
         splitTextAndAction: Bool = false,
         openPlacementExperience: Bool = false,
         forSwiftUI: Bool = false,
+        logger: Logger,
         callback: @Sendable @escaping (
             BreadPartnerEvents
         ) -> Void,
@@ -226,6 +231,7 @@ extension BreadPartnersSDK {
                 brandConfiguration: brandConfiguration,
                 splitTextAndAction: splitTextAndAction,
                 forSwiftUI: forSwiftUI,
+                logger: logger,
                 callback: callback
             ).createPopupOverlay(
                 popupPlacementModel: popupPlacementModel,

@@ -48,7 +48,6 @@ extension HTMLContentRenderer {
             actionLink = contentText
             contentText = ""
         }
-        print("FORSWIFT\(forSwiftUI)")
         if forSwiftUI {
             let combinedText = contentText + actionLink
             let swiftUIView = BreadPartnerLinkTextSwitUI(

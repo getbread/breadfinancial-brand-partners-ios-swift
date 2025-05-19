@@ -6,6 +6,7 @@
 </p>
 
 # **Bread Partners SDK – iOS Library**  
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/getbread/breadfinancial-brand-partners-ios-swift?sort=semver)](https://github.com/getbread/breadfinancial-brand-partners-ios-swift/releases)
 
 ## **Overview of the Bread Financial Brand Partners SDK – Apply and Buy**  
 
