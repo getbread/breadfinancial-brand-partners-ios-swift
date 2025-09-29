@@ -12,7 +12,6 @@
 
 import Foundation
 
-@available(iOS 15, *)
 extension PopupController {
 
     /// Fetches the web view placement data asynchronously by constructing a placement request and calling the API.

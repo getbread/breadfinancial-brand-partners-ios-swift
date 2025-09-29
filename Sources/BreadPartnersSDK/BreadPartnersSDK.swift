@@ -15,7 +15,6 @@ import UIKit
 
 /// The primary interface class for interacting with the Bread Partners SDK.
 /// Provides entry points for initialization, configuration, and SDK-level actions.
-@available(iOS 15, *)
 public class BreadPartnersSDK: NSObject, UITextViewDelegate {
 
     public static var shared: BreadPartnersSDK = {

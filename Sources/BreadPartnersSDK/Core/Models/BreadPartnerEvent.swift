@@ -14,7 +14,6 @@ import SwiftUI
 import UIKit
 
 /// Enum representing different events supported by BreadPartnerSDK.
-@available(iOS 15, *)
 public enum BreadPartnerEvents {
 
     /// Renders a text view containing a clickable hyperlink.

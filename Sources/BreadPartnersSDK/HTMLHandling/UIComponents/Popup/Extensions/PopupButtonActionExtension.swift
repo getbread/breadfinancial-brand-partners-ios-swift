@@ -12,7 +12,6 @@
 
 import Foundation
 
-@available(iOS 15, *)
 extension PopupController {
     
     /// Handles the close button tap event..

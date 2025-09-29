@@ -13,7 +13,6 @@
 import UIKit
 
 /// An actor responsible for managing the elements within the popup.
-@available(iOS 15.0, *)
 internal actor PopupElements: NSObject {
 
     static let shared = PopupElements()

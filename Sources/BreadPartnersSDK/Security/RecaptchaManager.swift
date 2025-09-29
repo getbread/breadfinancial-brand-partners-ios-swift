@@ -13,7 +13,6 @@
 //@preconcurrency import RecaptchaEnterprise
 //
 ///// `RecaptchaManager` handles the process of executing a reCAPTCHA for verifying user actions.
-//@available(iOS 15, *)
 //internal actor RecaptchaManager:@unchecked Sendable {
 //
 //    private let logger: Logger

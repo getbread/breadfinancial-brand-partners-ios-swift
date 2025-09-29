@@ -13,7 +13,6 @@
 import Foundation
 
 /// Class responsible for logging information for debugging and tracking purposes.
-@available(iOS 15, *)
 internal class Logger: NSObject, @unchecked Sendable {
 
     static let shared = Logger()

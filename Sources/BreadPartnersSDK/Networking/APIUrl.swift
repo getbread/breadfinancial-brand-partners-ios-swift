@@ -26,7 +26,7 @@ internal enum APIUrlType {
 
 internal actor APIUrl {
 
-    static var currentEnvironment: BreadPartnersEnvironment = .prod
+    nonisolated(unsafe) static var currentEnvironment: BreadPartnersEnvironment = .prod
 
     private let baseURL: String
     private let rtpsBaseURL: String

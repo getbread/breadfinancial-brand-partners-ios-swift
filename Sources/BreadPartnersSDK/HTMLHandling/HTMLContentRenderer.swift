@@ -14,7 +14,6 @@ import Foundation
 import UIKit
 
 /// Renders parsed HTML content into native UI elements.
-@available(iOS 15, *)
 @MainActor
 internal class HTMLContentRenderer {
 
