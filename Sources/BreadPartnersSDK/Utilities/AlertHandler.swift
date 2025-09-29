@@ -17,7 +17,6 @@
 ///// It provides options to:
 ///// - Completely suppress all alerts
 ///// - Suppress only alerts triggered during RTPS flow
-//@available(iOS 15, *)
 //internal actor AlertHandler:Sendable {
 //
 //    private var alertController: UIAlertController?

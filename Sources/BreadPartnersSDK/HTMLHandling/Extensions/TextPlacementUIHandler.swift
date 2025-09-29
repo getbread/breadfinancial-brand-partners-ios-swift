@@ -12,7 +12,6 @@
 
 import UIKit
 
-@available(iOS 15, *)
 extension HTMLContentRenderer {
 
     /// Renders a text view and action button for either SwiftUI or UIKit.

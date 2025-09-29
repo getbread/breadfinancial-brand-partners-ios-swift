@@ -14,7 +14,6 @@ import Foundation
 import UIKit
 
 /// `CommonUtils` class provides utility methods for common operations across the BreadPartner SDK.
-@available(iOS 15, *)
 internal actor CommonUtils: NSObject {
 
     func getCurrentTimestamp() -> String {

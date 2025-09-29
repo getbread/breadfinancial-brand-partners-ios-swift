@@ -12,7 +12,6 @@
 
 import Foundation
 
-@available(iOS 15, *)
 extension BreadPartnersSDK {
     //    /// This method does bot behavior check using the Recaptcha v3 SDK,
     //    /// to protect against malicious attacks.
@@ -204,6 +203,14 @@ extension BreadPartnersSDK {
                                     .popupPlacementParsingError
                             ])))
             }
+            var emptyAttributedString: NSAttributedString
+
+            if #available(iOS 15, *) {
+                emptyAttributedString = NSAttributedString("")
+            } else {
+                emptyAttributedString = NSAttributedString(string: "")
+            }
+            
             let popupPlacementModel = PopupPlacementModel(
                 overlayType: "EMBEDDED_OVERLAY",
                 location: responseModel.placements?.first?.renderContext?
@@ -211,10 +218,10 @@ extension BreadPartnersSDK {
                 brandLogoUrl: "",
                 webViewUrl: responseModel.placements?.first?.renderContext?
                     .embeddedUrl ?? "",
-                overlayTitle: NSAttributedString(""),
-                overlaySubtitle: NSAttributedString(""),
-                overlayContainerBarHeading: NSAttributedString(""),
-                bodyHeader: NSAttributedString(""),
+                overlayTitle: emptyAttributedString,
+                overlaySubtitle: emptyAttributedString,
+                overlayContainerBarHeading: emptyAttributedString,
+                bodyHeader: emptyAttributedString,
                 dynamicBodyModel: PopupPlacementModel.DynamicBodyModel(
                     bodyDiv: [
                         "": PopupPlacementModel.DynamicBodyContent(
@@ -222,7 +229,7 @@ extension BreadPartnersSDK {
                         )
                     ]
                 ),
-                disclosure: NSAttributedString("")
+                disclosure: emptyAttributedString
             )
             await HTMLContentRenderer(
                 integrationKey: integrationKey,

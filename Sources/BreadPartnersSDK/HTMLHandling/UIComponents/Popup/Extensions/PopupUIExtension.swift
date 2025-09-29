@@ -12,7 +12,6 @@
 
 import UIKit
 
-@available(iOS 15, *)
 extension PopupController {
 
     /// Sets up the user interface for the popup.

@@ -21,7 +21,6 @@ internal enum HTTPMethod: String, Sendable {
 }
 
 /// A utility class for making HTTP API requests.
-@available(iOS 15, *)
 internal class APIClient: @unchecked Sendable {
 
     init(

@@ -13,7 +13,6 @@
 @preconcurrency import WebKit
 
 /// Manages WebView interactions and events within the SDK.
-@available(iOS 15, *)
 internal class BreadFinancialWebViewInterstitial: NSObject,
     WKNavigationDelegate, WKScriptMessageHandler
 {

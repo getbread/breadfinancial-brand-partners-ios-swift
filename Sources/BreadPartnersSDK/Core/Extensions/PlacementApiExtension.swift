@@ -12,7 +12,6 @@
 
 import Foundation
 
-@available(iOS 15, *)
 extension BreadPartnersSDK {
 
     /// Retrieve brand-specific configurations, such as the Recaptcha key.

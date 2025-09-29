@@ -15,7 +15,6 @@ import UIKit
 import WebKit
 
 /// A view controller responsible for managing and displaying the popup overlay.
-@available(iOS 15, *)
 internal class PopupController: UIViewController,@preconcurrency AppRestartListener {
 
     var integrationKey: String

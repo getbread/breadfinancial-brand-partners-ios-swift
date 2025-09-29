@@ -12,7 +12,6 @@
 
 import SwiftUI
 
-@available(iOS 15, *)
 extension HTMLContentRenderer {
 
     /// Creates an attributed string that combines normal text and a clickable link.
