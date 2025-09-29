@@ -15,19 +15,12 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.7.5"),
-        .package(
-            url:
-                "https://github.com/GoogleCloudPlatform/recaptcha-enterprise-mobile-sdk.git",
-            from: "18.6.0"),
     ],
     targets: [
         .target(
             name: "BreadPartnersSDKSwift",
             dependencies: [
                 "SwiftSoup",
-                .product(
-                    name: "RecaptchaEnterprise",
-                    package: "recaptcha-enterprise-mobile-sdk"),
             ]
         )
     ]
