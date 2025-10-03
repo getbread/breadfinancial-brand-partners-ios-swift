@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "BreadPartnersSDKSwift",
     platforms: [
-        .iOS(.v13)
+        .iOS(.v15)
     ],
     products: [
         .library(
@@ -15,12 +15,19 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.7.5"),
+        .package(
+            url:
+                "https://github.com/GoogleCloudPlatform/recaptcha-enterprise-mobile-sdk.git",
+            from: "18.8.1"),
     ],
     targets: [
         .target(
             name: "BreadPartnersSDKSwift",
             dependencies: [
                 "SwiftSoup",
+                .product(
+                    name: "RecaptchaEnterprise",
+                    package: "recaptcha-enterprise-mobile-sdk"),
             ]
         )
     ]

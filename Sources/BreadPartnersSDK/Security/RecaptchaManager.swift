@@ -9,32 +9,56 @@
 ////
 ////  © 2025 Bread Financial
 ////------------------------------------------------------------------------------
-//
-//@preconcurrency import RecaptchaEnterprise
-//
-///// `RecaptchaManager` handles the process of executing a reCAPTCHA for verifying user actions.
-//internal actor RecaptchaManager:@unchecked Sendable {
-//
-//    private let logger: Logger
-//
-//    init(logger: Logger = Logger()) {
-//        self.logger = logger
-//    }
-//
-//    func executeReCaptcha(
-//        siteKey: String,
-//        action: RecaptchaAction,
-//        timeout: Double = 10000,
-//        debug: Bool = false
-//    ) async throws -> String {
-//        let client = try await Recaptcha.fetchClient(withSiteKey: siteKey)
-//        let token = try await client.execute(
-//            withAction: action, withTimeout: timeout)
-//
-//        if debug {
-//            logger.logReCaptchaToken(token: token)
-//        }
-//        return token
-//    }
-//
-//}
+
+@preconcurrency import RecaptchaEnterprise
+
+/// `RecaptchaManager` handles the process of executing a reCAPTCHA for verifying user actions.
+internal actor RecaptchaManager:@unchecked Sendable {
+
+    static let shared = RecaptchaManager()
+    private let logger: Logger
+    private var recaptchaClient: RecaptchaClient? = nil
+
+    private init(logger: Logger = Logger()) {
+        self.logger = logger
+    }
+
+    func fetchRecaptchaClient(siteKey: String) async throws {
+        if recaptchaClient != nil {
+            return
+        }
+        do {
+            self.recaptchaClient = try await Recaptcha.fetchClient(withSiteKey: siteKey)
+        } catch let error as RecaptchaError {
+            throw error
+        }
+    }
+
+    func executeReCaptcha(
+        siteKey: String,
+        action: RecaptchaAction,
+        timeout: Double = 10000,
+        debug: Bool = false
+    ) async throws -> String {
+        do {
+            try await fetchRecaptchaClient(siteKey: siteKey)
+            if (recaptchaClient != nil) {
+                do {
+                    let token = try await recaptchaClient!.execute(
+                        withAction: action, withTimeout: timeout)
+                    if debug {
+                        logger.logReCaptchaToken(token: token)
+                    }
+                    
+                    return token
+                } catch let error as RecaptchaError {
+                    throw error
+                }
+            }
+        } catch let error as RecaptchaError {
+            throw error
+        }
+        
+        return ""
+    }
+}
