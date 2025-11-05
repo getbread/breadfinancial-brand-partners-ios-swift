@@ -25,7 +25,9 @@ extension BreadPartnersSDK {
             BreadPartnerEvents
         ) -> Void
     ) async {
-        let siteKey = brandConfiguration?.config.recaptchaSiteKeyQA
+        let siteKey = brandConfiguration?.config.getRecaptchaKey(
+            for: merchantConfiguration.env ?? BreadPartnersEnvironment.prod
+        )
 
         do {
             let token = try await RecaptchaManager.shared.executeReCaptcha(
