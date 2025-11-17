@@ -68,6 +68,30 @@ public enum BreadPartnersLocationType: String, CaseIterable, @unchecked Sendable
     case header
     case search
     case myaccount
+    
+    /// Maps location types to their corresponding channel codes
+    public static let locationChannelMap: [BreadPartnersLocationType: String] = [
+        .homepage: "H",
+        .landing: "L",
+        .search: "S",
+        .product: "P",
+        .category: "C",
+        .banner: "U",
+        .checkout: "O",
+        .cart: "A",
+        .mobile: "E",
+        .loyalty: "D",
+        .footer: "F",
+        .bag: "2",
+        .dashboard: "5",
+        .myaccount: "5",
+        .header: "R"
+    ]
+    
+    /// Returns the channel code for this location type
+    public var channelCode: String? {
+        return Self.locationChannelMap[self]
+    }
 }
 
 /// Specifies the type of financing for the placement.
