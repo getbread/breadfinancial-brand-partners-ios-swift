@@ -67,6 +67,7 @@ public enum BreadPartnersLocationType: String, CaseIterable, @unchecked Sendable
     case product
     case header
     case search
+    case myaccount
 }
 
 /// Specifies the type of financing for the placement.
