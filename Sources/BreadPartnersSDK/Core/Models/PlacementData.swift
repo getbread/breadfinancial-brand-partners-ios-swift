@@ -26,7 +26,7 @@ public class PlacementData: @unchecked Sendable {
     public var financingType: BreadPartnersFinancingType?
     public var locationType: BreadPartnersLocationType?
     public var placementId: String?
-    public var domID: String
+    public var domID: String?
     public var allowCheckout: Bool?
     public var order: Order?
     public var defaultSelectedCardKey: String?
