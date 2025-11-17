@@ -36,7 +36,7 @@ public class PlacementData: @unchecked Sendable {
         financingType: BreadPartnersFinancingType? = nil,
         locationType: BreadPartnersLocationType? = nil,
         placementId: String? = nil,
-        domID: String?, allowCheckout: Bool? = nil, order: Order? = nil,
+        domID: String? = nil, allowCheckout: Bool? = nil, order: Order? = nil,
         defaultSelectedCardKey: String? = nil, selectedCardKey: String? = nil
     ) {
         self.financingType = financingType
