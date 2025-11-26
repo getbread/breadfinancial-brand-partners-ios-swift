@@ -42,7 +42,9 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
         self.sdkEnvironment = environment
         self.integrationKey = integrationKey
         self.isLoggingEnabled = enableLog
-        return await fetchBrandConfig()
+        let logger = Logger()
+        logger.setLogging(enabled: isLoggingEnabled)
+        return await fetchBrandConfig(logger: logger)
     }
 
     /// Use this function to display text placements in your app's UI.
