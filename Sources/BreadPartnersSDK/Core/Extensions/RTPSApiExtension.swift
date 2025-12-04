@@ -21,6 +21,7 @@ extension BreadPartnersSDK {
         placementsConfiguration: PlacementConfiguration,
         forSwiftUI: Bool = false,
         logger: Logger,
+        showCaptcha: Bool = false,
         callback: @Sendable @escaping (
             BreadPartnerEvents
         ) -> Void
@@ -43,6 +44,7 @@ extension BreadPartnersSDK {
                 forSwiftUI: forSwiftUI,
                 logger: logger,
                 callback: callback,
+                showCaptcha: showCaptcha,
                 token: token)
         } catch let error as RecaptchaError {
             print("Recaptcha Error: code \(error.errorCode), message \(error.errorMessage)")
@@ -66,6 +68,7 @@ extension BreadPartnersSDK {
         callback: @Sendable @escaping (
             BreadPartnerEvents
         ) -> Void,
+        showCaptcha: Bool = false,
         token: String
     ) async {
         do {
@@ -81,11 +84,15 @@ extension BreadPartnersSDK {
                 reCaptchaToken: token
             )
 
-            let headers: [String: String] = [
+            var headers: [String: String] = [
                 Constants.headerClientKey: integrationKey,
                 Constants.headerRequestedWithKey: Constants
                     .headerRequestedWithValue,
             ]
+            
+            if showCaptcha {
+                headers["X-Bread-Testing"] = "captcha"
+            }
 
             let rtpsRequestBuilt = requestBuilder.build()
 
@@ -125,15 +132,43 @@ extension BreadPartnersSDK {
                 logger: logger,
                 callback: callback)
 
-        } catch {
-            return callback(
-                .sdkError(
-                    error: NSError(
-                        domain: "", code: 500,
-                        userInfo: [
-                            NSLocalizedDescriptionKey: Constants.apiError(
-                                message: error.localizedDescription)
-                        ])))
+        } catch let error as NSError {
+            if error.domain == "IncapsulaChallenge" {
+                guard let htmlContent = error.userInfo["htmlContent"] as? String,
+                      let url = error.userInfo["url"] as? String else {
+                    return callback(.sdkError(error: error))
+                }
+
+                let challengeController = ChallengeController(
+                    htmlContent: htmlContent,
+                    originalURL: url,
+                    callback: callback,
+                    retryRequest: { [weak self] in
+                        Task { @MainActor in
+                            // Restart from executeSecurityCheck to get fresh reCAPTCHA token
+                            // and clean WebKit process
+                            await self?.executeSecurityCheck(
+                                merchantConfiguration: merchantConfiguration,
+                                placementsConfiguration: placementsConfiguration,
+                                forSwiftUI: forSwiftUI,
+                                logger: logger,
+                                callback: callback
+                            )
+                        }
+                    }
+                )
+
+                return callback(.renderPopupView(view: challengeController))
+            } else {
+                return callback(
+                    .sdkError(
+                        error: NSError(
+                            domain: "", code: 500,
+                            userInfo: [
+                                NSLocalizedDescriptionKey: Constants.apiError(
+                                    message: error.localizedDescription)
+                            ])))
+            }
         }
     }
 
