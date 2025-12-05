@@ -90,16 +90,12 @@ internal class ChallengeController: UIViewController, WKNavigationDelegate {
     // MARK: - WKNavigationDelegate
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("Olga: didFinish completed")
-        print("Olga: Current URL - \(webView.url?.absoluteString ?? "nil")")
-        
         if !hasInitialLoadCompleted {
             hasInitialLoadCompleted = true
         } else {
             // Challenge completed - check if we're back at original URL or got redirected
             if let currentURL = webView.url?.absoluteString,
                currentURL.contains(URL(string: originalURL)?.host ?? "") {
-                print("Olga: Challenge completed, dismissing and retrying")
                 
                 dismiss(animated: true) {
                     self.retryRequest?()

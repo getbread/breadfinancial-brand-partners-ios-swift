@@ -21,7 +21,6 @@ extension BreadPartnersSDK {
         placementsConfiguration: PlacementConfiguration,
         forSwiftUI: Bool = false,
         logger: Logger,
-        showCaptcha: Bool = false,
         callback: @Sendable @escaping (
             BreadPartnerEvents
         ) -> Void
@@ -44,7 +43,6 @@ extension BreadPartnersSDK {
                 forSwiftUI: forSwiftUI,
                 logger: logger,
                 callback: callback,
-                showCaptcha: showCaptcha,
                 token: token)
         } catch let error as RecaptchaError {
             print("Recaptcha Error: code \(error.errorCode), message \(error.errorMessage)")
@@ -68,7 +66,6 @@ extension BreadPartnersSDK {
         callback: @Sendable @escaping (
             BreadPartnerEvents
         ) -> Void,
-        showCaptcha: Bool = false,
         token: String
     ) async {
         do {
@@ -84,15 +81,11 @@ extension BreadPartnersSDK {
                 reCaptchaToken: token
             )
 
-            var headers: [String: String] = [
+            let headers: [String: String] = [
                 Constants.headerClientKey: integrationKey,
                 Constants.headerRequestedWithKey: Constants
                     .headerRequestedWithValue,
             ]
-            
-            if showCaptcha {
-                headers["X-Bread-Testing"] = "captcha"
-            }
 
             let rtpsRequestBuilt = requestBuilder.build()
 
