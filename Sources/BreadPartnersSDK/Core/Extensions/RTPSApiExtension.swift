@@ -100,7 +100,7 @@ extension BreadPartnersSDK {
                 try await CommonUtils().decodeJSON(
                     from: response, to: RTPSResponse.self
                 )
-            let returnResultType = preScreenLookupResponse.returnCode
+            let returnResultType = preScreenLookupResponse.returnCodeString
             let prescreenResult = getPrescreenResult(
                 from: returnResultType ?? "10")
             placementsConfiguration.rtpsData!.prescreenId =
@@ -110,7 +110,7 @@ extension BreadPartnersSDK {
             /// Since this call runs in the background without user interaction,
             /// if the result is not "approved" or prescreenId is nill,
             /// we simply return without taking any further action.
-            if prescreenResult != .approved
+            if (prescreenResult != .approved && prescreenResult != .accountFound)
                 || placementsConfiguration.rtpsData?.prescreenId == nil
             {
                 return

@@ -77,7 +77,7 @@ internal actor CommonUtils: NSObject {
         integrationKey: String,
         merchantConfiguration: MerchantConfiguration,
         rtpsData: RTPSData,
-        prescreenId: Int?
+        prescreenId: Int64?
     ) async -> URL? {
 
         let mockResponseValue = rtpsData.mockResponse?.rawValue

@@ -39,7 +39,13 @@ func getPrescreenResult(from apiResponse: String) -> PrescreenResult {
 
 /// Represents the response model for an RTPS.
 struct RTPSResponse: Codable {
-    let returnCode: String?
-    let prescreenId: Int?
+    let returnCode: Int?
+    let prescreenId: Int64?
+    
+    /// Returns the returnCode as a String for mapping to PrescreenResult
+    var returnCodeString: String? {
+        guard let code = returnCode else { return nil }
+        return String(code)
+    }
 }
 
