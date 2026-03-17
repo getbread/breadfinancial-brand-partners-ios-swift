@@ -69,7 +69,19 @@ extension BreadPartnersSDK {
         token: String
     ) async {
         do {
-
+            // Check for Batch Prescreen Flow when prescreen id has to be entered by user.
+            if (placementsConfiguration.rtpsData?.customerAcceptedOffer == true) {
+                return await fetchRTPSData(
+                    merchantConfiguration: merchantConfiguration,
+                    placementsConfiguration: placementsConfiguration,
+                    splitTextAndAction: splitTextAndAction,
+                    openPlacementExperience: openPlacementExperience,
+                    forSwiftUI: forSwiftUI,
+                    logger: logger,
+                    callback: callback)
+            }
+            
+            // Check if it is a regular RTPS flow or Batch Prescreen (prescreenId is known).
             let apiUrl = APIUrl(
                 urlType: placementsConfiguration.rtpsData?.prescreenId == nil
                     ? .prescreen : .virtualLookup
@@ -100,16 +112,23 @@ extension BreadPartnersSDK {
                 try await CommonUtils().decodeJSON(
                     from: response, to: RTPSResponse.self
                 )
-            let returnResultType = preScreenLookupResponse.returnCodeString
+            let returnResultType = preScreenLookupResponse.returnCode
             let prescreenResult = getPrescreenResult(
                 from: returnResultType ?? "10")
+            
+            // Map response data back to configurations.
             placementsConfiguration.rtpsData!.prescreenId =
                 preScreenLookupResponse.prescreenId
+            placementsConfiguration.rtpsData?.cardType = preScreenLookupResponse.cardType
+            
+            let updatedMerchantConfiguration = preScreenLookupResponse.updateMerchantConfiguration(merchantConfiguration)
+            
             logger.printLog("PreScreenID:Result: \(prescreenResult )")
 
-            /// Since this call runs in the background without user interaction,
-            /// if the result is not "approved" or prescreenId is nill,
-            /// we simply return without taking any further action.
+            // Since this call runs in the background without user interaction,
+            // if the result is not "approved"(in case of regular prescreen call) and not "account found" (in case of lookup call)
+            // or prescreenId is nill (in case user is approved, but already has an account),
+            // we simply return without taking any further action.
             if (prescreenResult != .approved && prescreenResult != .accountFound)
                 || placementsConfiguration.rtpsData?.prescreenId == nil
             {
@@ -117,7 +136,7 @@ extension BreadPartnersSDK {
             }
 
             await fetchRTPSData(
-                merchantConfiguration: merchantConfiguration,
+                merchantConfiguration: updatedMerchantConfiguration,
                 placementsConfiguration: placementsConfiguration,
                 splitTextAndAction: splitTextAndAction,
                 openPlacementExperience: openPlacementExperience,
@@ -181,12 +200,21 @@ extension BreadPartnersSDK {
         do {
             let apiUrl = APIUrl(urlType: .generatePlacements).url
 
-            let rtpsWebURL = await CommonUtils().buildRTPSWebURL(
-                integrationKey: integrationKey,
-                merchantConfiguration: merchantConfiguration,
-                rtpsData: placementsConfiguration.rtpsData!,
-                prescreenId: placementsConfiguration.rtpsData!.prescreenId
-            )?.absoluteString
+            let webURL: String?
+            if placementsConfiguration.rtpsData?.customerAcceptedOffer == true {
+                webURL = await CommonUtils().buildBpsWebURL(
+                    integrationKey: integrationKey,
+                    merchantConfiguration: merchantConfiguration,
+                    placementConfiguration: placementsConfiguration
+                )?.absoluteString
+            } else {
+                webURL = await CommonUtils().buildRTPSWebURL(
+                    integrationKey: integrationKey,
+                    merchantConfiguration: merchantConfiguration,
+                    rtpsData: placementsConfiguration.rtpsData!,
+                    prescreenId: placementsConfiguration.rtpsData!.prescreenId
+                )?.absoluteString
+            }
 
             let request = PlacementRequest(
                 placements: [
@@ -194,7 +222,7 @@ extension BreadPartnersSDK {
                         context: ContextRequestBody(
                             ENV: merchantConfiguration.env?.rawValue,
                             LOCATION: "RTPS-Approval",
-                            embeddedUrl: rtpsWebURL
+                            embeddedUrl: webURL
                         )
                     )
                 ], brandId: integrationKey

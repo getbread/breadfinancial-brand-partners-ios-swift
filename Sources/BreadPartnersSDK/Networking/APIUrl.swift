@@ -15,6 +15,7 @@ import Foundation
 /// Enum to define different types of API URLs.
 internal enum APIUrlType {
     case rtpsWebUrl(type: String)
+    case bpsWebUrl
     case brandStyle(brandId: String)
     case brandConfig(brandId: String)
     case generatePlacements
@@ -59,6 +60,8 @@ internal actor APIUrl {
         switch urlType {
         case .rtpsWebUrl(let type):
             return "\(rtpsBaseURL)/prescreen/\(type)"
+        case .bpsWebUrl:
+            return "\(rtpsBaseURL)/batch-prescreen/start"
         case .brandStyle(let brandId):
             return "\(baseURL)/brands/\(brandId)/style"
         case .brandConfig(let brandId):

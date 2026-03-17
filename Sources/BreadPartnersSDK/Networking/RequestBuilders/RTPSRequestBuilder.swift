@@ -46,7 +46,8 @@ class RTPSRequestBuilder: @unchecked Sendable {
                 reCaptchaToken: token,
                 mockResponse: rtpsData.mockResponse?.rawValue,
                 overrideConfig: RTPSRequest.OverrideConfig(
-                    enhancedPresentment: true)
+                    enhancedPresentment: true),
+                customerAcceptedOffer: rtpsData.customerAcceptedOffer
             )
         } else {
             return RTPSRequest(
@@ -57,7 +58,8 @@ class RTPSRequestBuilder: @unchecked Sendable {
                 mockResponse: rtpsData.mockResponse?.rawValue,
                 overrideConfig: RTPSRequest.OverrideConfig(
                     enhancedPresentment: true),
-                prescreenId: String(rtpsData.prescreenId!)
+                prescreenId: String(rtpsData.prescreenId!),
+                customerAcceptedOffer: rtpsData.customerAcceptedOffer
             )
         }
 
