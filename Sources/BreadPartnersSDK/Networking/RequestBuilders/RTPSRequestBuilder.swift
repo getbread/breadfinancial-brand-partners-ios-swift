@@ -15,12 +15,12 @@ class RTPSRequestBuilder: @unchecked Sendable {
 
     private var merchantConfiguration: MerchantConfiguration
     private var rtpsData: RTPSData
-    private var token: String
+    private var token: String?
 
     init(
         merchantConfiguration: MerchantConfiguration,
         rtpsData: RTPSData,
-        reCaptchaToken: String
+        reCaptchaToken: String?
     ) {
         self.merchantConfiguration = merchantConfiguration
         self.rtpsData = rtpsData

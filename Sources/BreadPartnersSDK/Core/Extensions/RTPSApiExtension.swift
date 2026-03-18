@@ -16,47 +16,40 @@ import RecaptchaEnterprise
 extension BreadPartnersSDK {
     /// This method does bot behavior check using the Recaptcha v3 SDK,
     /// to protect against malicious attacks.
-    func executeSecurityCheck(
+    private func executeSecurityCheck(
         merchantConfiguration: MerchantConfiguration,
-        placementsConfiguration: PlacementConfiguration,
-        forSwiftUI: Bool = false,
-        logger: Logger,
-        callback: @Sendable @escaping (
-            BreadPartnerEvents
-        ) -> Void
-    ) async {
+        logger: Logger
+    ) async throws -> String {
         let siteKey = brandConfiguration?.config.getRecaptchaKey(
             for: merchantConfiguration.env ?? BreadPartnersEnvironment.prod
         )
 
-        do {
-            let token = try await RecaptchaManager.shared.executeReCaptcha(
-                siteKey: siteKey ?? "",
-                action: .init(customAction: "checkout"),
-                timeout: 10000,
-                debug: logger.isLoggingEnabled
-            )
-            await preScreenLookupCall(
-                merchantConfiguration: merchantConfiguration,
-                placementsConfiguration: placementsConfiguration,
-                splitTextAndAction: false, openPlacementExperience: false,
-                forSwiftUI: forSwiftUI,
-                logger: logger,
-                callback: callback,
-                token: token)
-        } catch let error as RecaptchaError {
-            print("Recaptcha Error: code \(error.errorCode), message \(error.errorMessage)")
-        } catch {
-            print("Unknown error: \(error)")
-        }
+        let token = try await RecaptchaManager.shared.executeReCaptcha(
+            siteKey: siteKey ?? "",
+            action: .init(customAction: "checkout"),
+            timeout: 10000,
+            debug: logger.isLoggingEnabled
+        )
+        
+        return token
     }
 
-    /// Once the Recaptcha token is obtained, make the pre-screen lookup API call.
-    /// - If  `prescreenId` was previously saved by the brand partner when calling the pre-screen endpoint,
-    ///      then trigger `virtualLookup`.
-    /// - Else call pre-screen endpoint to fetch `prescreenId`.
-    /// - Both endpoints require user details to build request payload.
-    private func preScreenLookupCall(
+    /// Makes RTPS (Real-Time Pre-Screen) API calls with conditional reCaptcha token validation.
+    ///
+    /// This method handles three different flows:
+    /// 1. **Batch Prescreen Flow**: When `customerAcceptedOffer` is true, skips RTPS and directly fetches placement data.
+    /// 2. **Prescreen Flow**: When `prescreenId` is nil, calls the prescreen endpoint with a reCaptcha token for bot protection.
+    /// 3. **Virtual Lookup Flow**: When `prescreenId` is known, calls the virtualLookup endpoint without a reCaptcha token.
+    ///
+    /// - Parameters:
+    ///   - merchantConfiguration: Merchant and buyer configuration details.
+    ///   - placementsConfiguration: Placement configuration including RTPS data.
+    ///   - splitTextAndAction: Whether to split text and action components.
+    ///   - openPlacementExperience: Whether to automatically open the placement experience.
+    ///   - forSwiftUI: Whether the view is for SwiftUI.
+    ///   - logger: Logger instance for tracking events.
+    ///   - callback: Callback to handle SDK events.
+    internal func rtpsCall(
         merchantConfiguration: MerchantConfiguration,
         placementsConfiguration: PlacementConfiguration,
         splitTextAndAction: Bool = false,
@@ -65,8 +58,7 @@ extension BreadPartnersSDK {
         logger: Logger,
         callback: @Sendable @escaping (
             BreadPartnerEvents
-        ) -> Void,
-        token: String
+        ) -> Void
     ) async {
         do {
             // Check for Batch Prescreen Flow when prescreen id has to be entered by user.
@@ -82,15 +74,53 @@ extension BreadPartnersSDK {
             }
             
             // Check if it is a regular RTPS flow or Batch Prescreen (prescreenId is known).
+            let isPrescreen = placementsConfiguration.rtpsData?.prescreenId == nil
+            
+            // Validate required fields for prescreen requests
+            if isPrescreen {
+                let buyer = merchantConfiguration.buyer
+                let billingAddress = buyer?.billingAddress
+                
+                // Check if firstname, lastname, and complete address are provided
+                guard let givenName = buyer?.givenName, !givenName.isEmpty,
+                      let familyName = buyer?.familyName, !familyName.isEmpty,
+                      let address1 = billingAddress?.address1, !address1.isEmpty,
+                      let country = billingAddress?.country, !country.isEmpty,
+                      let locality = billingAddress?.locality, !locality.isEmpty,
+                      let region = billingAddress?.region, !region.isEmpty,
+                      let postalCode = billingAddress?.postalCode, !postalCode.isEmpty else {
+                    return callback(
+                        .sdkError(
+                            error: NSError(
+                                domain: "", code: 400,
+                                userInfo: [
+                                    NSLocalizedDescriptionKey: Constants.prescreenRequiredFieldsError
+                                ]
+                            )
+                        )
+                    )
+                }
+            }
+            
+            // Only obtain reCaptcha token for prescreen requests
+            let reCaptchaToken: String?
+            if isPrescreen {
+                reCaptchaToken = try await executeSecurityCheck(
+                    merchantConfiguration: merchantConfiguration,
+                    logger: logger
+                )
+            } else {
+                reCaptchaToken = nil
+            }
+            
             let apiUrl = APIUrl(
-                urlType: placementsConfiguration.rtpsData?.prescreenId == nil
-                    ? .prescreen : .virtualLookup
+                urlType: isPrescreen ? .prescreen : .virtualLookup
             ).url
 
             let requestBuilder = RTPSRequestBuilder(
                 merchantConfiguration: merchantConfiguration,
                 rtpsData: placementsConfiguration.rtpsData!,
-                reCaptchaToken: token
+                reCaptchaToken: reCaptchaToken
             )
 
             let headers: [String: String] = [
@@ -157,11 +187,13 @@ extension BreadPartnersSDK {
                     callback: callback,
                     retryRequest: { [weak self] in
                         Task { @MainActor in
-                            // Restart from executeSecurityCheck to get fresh reCAPTCHA token
+                            // Restart from rtpsCall to get fresh reCAPTCHA token
                             // and clean WebKit process
-                            await self?.executeSecurityCheck(
+                            await self?.rtpsCall(
                                 merchantConfiguration: merchantConfiguration,
                                 placementsConfiguration: placementsConfiguration,
+                                splitTextAndAction: splitTextAndAction,
+                                openPlacementExperience: openPlacementExperience,
                                 forSwiftUI: forSwiftUI,
                                 logger: logger,
                                 callback: callback

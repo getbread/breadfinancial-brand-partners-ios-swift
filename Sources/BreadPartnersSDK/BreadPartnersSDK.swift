@@ -139,9 +139,11 @@ public class BreadPartnersSDK: NSObject, UITextViewDelegate {
             await fetchBrandConfig(logger: logger)
         }
             
-        await executeSecurityCheck(
+        await rtpsCall(
             merchantConfiguration: merchantConfiguration,
             placementsConfiguration: mutablePlacementsConfiguration,
+            splitTextAndAction: splitTextAndAction,
+            openPlacementExperience: false,
             forSwiftUI: forSwiftUI,
             logger: logger,
             callback: callback
