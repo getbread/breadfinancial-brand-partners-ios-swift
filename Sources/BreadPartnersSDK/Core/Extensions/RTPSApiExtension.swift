@@ -147,6 +147,7 @@ extension BreadPartnersSDK {
             let returnResultType = preScreenLookupResponse.returnCode
             let prescreenResult = getPrescreenResult(
                 from: returnResultType ?? "10")
+            logger.printLog("PreScreenID:Result: \(prescreenResult )")
             
             // Since this call runs in the background without user interaction,
             // if the result is not "approved"(in case of regular prescreen call) and not "account found" (in case of lookup call)
@@ -162,7 +163,6 @@ extension BreadPartnersSDK {
             placementsConfiguration.rtpsData!.prescreenId =
                 preScreenLookupResponse.prescreenId
             placementsConfiguration.rtpsData?.cardType = preScreenLookupResponse.cardType
-            logger.printLog("PreScreenID:Result: \(prescreenResult )")
 
             await fetchRTPSData(
                 merchantConfiguration: preScreenLookupResponse.updateMerchantConfiguration(merchantConfiguration),
