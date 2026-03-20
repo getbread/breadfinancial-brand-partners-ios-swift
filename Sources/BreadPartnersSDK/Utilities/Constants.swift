@@ -50,7 +50,7 @@ internal class Constants{
     
     static let securityCheckAlertAcknolwedgeMessage = "Your web view will load once the captcha verification is successfully completed. This ensures that all transactions are secure."
     
-    static func securityCheckAlertFailedMessage(error:String) -> String {        
+    static func securityCheckAlertFailedMessage(error:String) -> String {
         return "Error: \(error)"
     }
     
@@ -72,6 +72,8 @@ internal class Constants{
     static let popupPlacementParsingError = "\(error) Unable to parse popup placement."
     static let missingPopupPlacementError = "Unhandled popup placement type."
     static let somethingWentWrong = "Something went wrong. Please try again later."
+    
+    static let prescreenRequiredFieldsError = "Error: Prescreen requires customer information: firstname, lastname, and complete billing address must be provided in MerchantConfiguration."
 
     static func unableToLoadWebURL(message:String)->String{
         return  "\(error) Web Url Loading Issue: \(message)"

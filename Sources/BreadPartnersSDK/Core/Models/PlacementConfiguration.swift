@@ -17,7 +17,7 @@ import UIKit
 ///   - placementData: Defines text placements on the brand partner screen for the `registerPlacementFlow`.
 ///   - rtpsData: Specifies the real-time pre-screen configuration for the prescreen flow.
 ///   - popUpStyling: Configures the popup styling for each element rendered within the popup.
-public struct PlacementConfiguration {
+public struct PlacementConfiguration: @unchecked Sendable {
     public let placementData: PlacementData?
     public let rtpsData: RTPSData?
     public var popUpStyling: PopUpStyling?
