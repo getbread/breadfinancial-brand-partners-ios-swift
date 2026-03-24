@@ -42,7 +42,48 @@ extension HTMLContentRenderer {
         var contentText = textPlacementModel?.contentText ?? ""
         var actionLink = textPlacementModel?.actionLink ?? ""
         let actionType = textPlacementModel?.actionType
+        let htmlContent = textPlacementModel?.htmlContent
 
+        // For NO_ACTION type, render as formatted HTML text that's NOT clickable
+        if actionType == PlacementActionType.noAction.rawValue,
+           let htmlString = htmlContent, !htmlString.isEmpty {
+            
+            if forSwiftUI {
+                // For SwiftUI, convert HTML to attributed string and render as plain text
+                if let attributedString = htmlString.htmlToAttributedString() {
+                    let swiftUIView = BreadPartnerTextView(attributedString.string)
+                    self.callback(.renderSwiftUITextViewWithLink(textView: swiftUIView))
+                } else {
+                    // Fallback to plain text if HTML conversion fails
+                    let swiftUIView = BreadPartnerTextView(contentText)
+                    self.callback(.renderSwiftUITextViewWithLink(textView: swiftUIView))
+                }
+            } else {
+                // For UIKit, use plain UITextView with HTML attributed string (non-interactive)
+                let textView = UITextView()
+                textView.isEditable = false
+                textView.isScrollEnabled = false
+                textView.isSelectable = false // Make it non-interactive
+                textView.backgroundColor = .clear
+                
+                if let attributedString = htmlString.htmlToAttributedString() {
+                    // Create a mutable copy to remove any existing link attributes
+                    let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
+                    let range = NSRange(location: 0, length: mutableAttributedString.length)
+                    mutableAttributedString.removeAttribute(.link, range: range)
+                    
+                    textView.attributedText = mutableAttributedString
+                } else {
+                    // Fallback to plain text if HTML conversion fails
+                    textView.text = contentText
+                }
+                
+                self.callback(.renderTextViewWithLink(textView: textView))
+            }
+            return
+        }
+
+        // Original logic for other action types with clickable links
         if actionLink.isEmpty {
             actionLink = contentText
             contentText = ""
