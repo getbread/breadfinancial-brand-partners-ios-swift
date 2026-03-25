@@ -48,13 +48,45 @@ extension HTMLContentRenderer {
         if actionType == PlacementActionType.noAction.rawValue,
            let htmlString = htmlContent, !htmlString.isEmpty {
             
-            if forSwiftUI {
-                // For SwiftUI, convert HTML to attributed string and render as tappable text
-                if let attributedString = htmlString.htmlToAttributedString() {
-                    // Use the plain text without HTML tags, no links array (empty)
+            // Convert HTML to attributed string
+            if let attributedString = htmlString.htmlToAttributedString() {
+                // Create a mutable copy to remove any link attributes and underlines
+                let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
+                let range = NSRange(location: 0, length: mutableAttributedString.length)
+                mutableAttributedString.removeAttribute(.link, range: range)
+                mutableAttributedString.removeAttribute(.underlineStyle, range: range)
+                
+                // Apply configurable font sizes while preserving formatting (bold, superscript, etc.)
+                let baseFontSize: CGFloat = 18.0 // Default base font size
+                let superscriptFontSize: CGFloat = 12.0 // Default superscript font size
+                
+                mutableAttributedString.enumerateAttributes(in: range, options: []) { attributes, attrRange, _ in
+                    // Check if this is superscript by looking for baseline offset
+                    let baselineOffset = attributes[.baselineOffset] as? NSNumber
+                    let isSuperscript = (baselineOffset?.floatValue ?? 0) > 0
+                    
+                    if let currentFont = attributes[.font] as? UIFont {
+                        // Use smaller size for superscript, regular size for normal text
+                        let newSize = isSuperscript ? superscriptFontSize : baseFontSize
+                        
+                        // Preserve font traits (bold, italic)
+                        let fontDescriptor = currentFont.fontDescriptor
+                        let newFontDescriptor = fontDescriptor.withSize(newSize)
+                        let newFont = UIFont(descriptor: newFontDescriptor, size: newSize)
+                        
+                        mutableAttributedString.addAttribute(.font, value: newFont, range: attrRange)
+                    } else {
+                        // If no font attribute, add default font
+                        let defaultSize = isSuperscript ? superscriptFontSize : baseFontSize
+                        let defaultFont = UIFont.systemFont(ofSize: defaultSize)
+                        mutableAttributedString.addAttribute(.font, value: defaultFont, range: attrRange)
+                    }
+                }
+                
+                if forSwiftUI {
+                    // Use the new initializer that accepts attributed string to preserve HTML formatting
                     let swiftUIView = BreadPartnerLinkTextSwitUI(
-                        attributedString.string,
-                        links: [], // No links to underline
+                        attributedString: mutableAttributedString,
                         onTap: {
                             Task {
                                 await self.handleLinkInteraction(link: "")
@@ -63,7 +95,18 @@ extension HTMLContentRenderer {
                     )
                     self.callback(.renderSwiftUITextViewWithLink(textView: swiftUIView))
                 } else {
-                    // Fallback to plain text if HTML conversion fails
+                    // For UIKit, use BreadPartnerLinkText with HTML attributed string
+                    let textView = BreadPartnerLinkText()
+                    textView.configure(with: mutableAttributedString) { [self] _ in
+                        Task {
+                            await handleLinkInteraction(link: "")
+                        }
+                    }
+                    self.callback(.renderTextViewWithLink(textView: textView))
+                }
+            } else {
+                // Fallback to plain text if HTML conversion fails
+                if forSwiftUI {
                     let swiftUIView = BreadPartnerLinkTextSwitUI(
                         contentText,
                         links: [],
@@ -74,34 +117,16 @@ extension HTMLContentRenderer {
                         }
                     )
                     self.callback(.renderSwiftUITextViewWithLink(textView: swiftUIView))
-                }
-            } else {
-                // For UIKit, use BreadPartnerLinkText with HTML attributed string
-                let textView = BreadPartnerLinkText()
-                
-                if let attributedString = htmlString.htmlToAttributedString() {
-                    // Create a mutable copy to remove any link attributes and underlines
-                    let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
-                    let range = NSRange(location: 0, length: mutableAttributedString.length)
-                    mutableAttributedString.removeAttribute(.link, range: range)
-                    mutableAttributedString.removeAttribute(.underlineStyle, range: range)
-                    
-                    textView.configure(with: mutableAttributedString) { [self] _ in
-                        Task {
-                            await handleLinkInteraction(link: "")
-                        }
-                    }
                 } else {
-                    // Fallback to plain text if HTML conversion fails
+                    let textView = BreadPartnerLinkText()
                     let plainAttributedString = NSAttributedString(string: contentText)
                     textView.configure(with: plainAttributedString) { [self] _ in
                         Task {
                             await handleLinkInteraction(link: "")
                         }
                     }
+                    self.callback(.renderTextViewWithLink(textView: textView))
                 }
-                
-                self.callback(.renderTextViewWithLink(textView: textView))
             }
             return
         }
