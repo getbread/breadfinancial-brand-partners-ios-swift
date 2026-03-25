@@ -56,35 +56,7 @@ extension HTMLContentRenderer {
                 mutableAttributedString.removeAttribute(.link, range: range)
                 mutableAttributedString.removeAttribute(.underlineStyle, range: range)
                 
-                // Apply configurable font sizes while preserving formatting (bold, superscript, etc.)
-                let baseFontSize: CGFloat = 18.0 // Default base font size
-                let superscriptFontSize: CGFloat = 12.0 // Default superscript font size
-                
-                mutableAttributedString.enumerateAttributes(in: range, options: []) { attributes, attrRange, _ in
-                    // Check if this is superscript by looking for baseline offset
-                    let baselineOffset = attributes[.baselineOffset] as? NSNumber
-                    let isSuperscript = (baselineOffset?.floatValue ?? 0) > 0
-                    
-                    if let currentFont = attributes[.font] as? UIFont {
-                        // Use smaller size for superscript, regular size for normal text
-                        let newSize = isSuperscript ? superscriptFontSize : baseFontSize
-                        
-                        // Preserve font traits (bold, italic)
-                        let fontDescriptor = currentFont.fontDescriptor
-                        let newFontDescriptor = fontDescriptor.withSize(newSize)
-                        let newFont = UIFont(descriptor: newFontDescriptor, size: newSize)
-                        
-                        mutableAttributedString.addAttribute(.font, value: newFont, range: attrRange)
-                    } else {
-                        // If no font attribute, add default font
-                        let defaultSize = isSuperscript ? superscriptFontSize : baseFontSize
-                        let defaultFont = UIFont.systemFont(ofSize: defaultSize)
-                        mutableAttributedString.addAttribute(.font, value: defaultFont, range: attrRange)
-                    }
-                }
-                
                 if forSwiftUI {
-                    // Use the new initializer that accepts attributed string to preserve HTML formatting
                     let swiftUIView = BreadPartnerLinkTextSwitUI(
                         attributedString: mutableAttributedString,
                         onTap: {
@@ -95,7 +67,6 @@ extension HTMLContentRenderer {
                     )
                     self.callback(.renderSwiftUITextViewWithLink(textView: swiftUIView))
                 } else {
-                    // For UIKit, use BreadPartnerLinkText with HTML attributed string
                     let textView = BreadPartnerLinkText()
                     textView.configure(with: mutableAttributedString) { [self] _ in
                         Task {
@@ -131,7 +102,6 @@ extension HTMLContentRenderer {
             return
         }
 
-        // Original logic for other action types with clickable links
         if actionLink.isEmpty {
             actionLink = contentText
             contentText = ""
