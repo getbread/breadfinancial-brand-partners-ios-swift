@@ -44,38 +44,61 @@ extension HTMLContentRenderer {
         let actionType = textPlacementModel?.actionType
         let htmlContent = textPlacementModel?.htmlContent
 
-        // For NO_ACTION type, render as formatted HTML text that's NOT clickable
+        // For NO_ACTION type, render as formatted HTML text that's clickable (triggers textClicked callback)
         if actionType == PlacementActionType.noAction.rawValue,
            let htmlString = htmlContent, !htmlString.isEmpty {
             
             if forSwiftUI {
-                // For SwiftUI, convert HTML to attributed string and render as plain text
+                // For SwiftUI, convert HTML to attributed string and render as tappable text
                 if let attributedString = htmlString.htmlToAttributedString() {
-                    let swiftUIView = BreadPartnerTextView(attributedString.string)
+                    // Use the plain text without HTML tags, no links array (empty)
+                    let swiftUIView = BreadPartnerLinkTextSwitUI(
+                        attributedString.string,
+                        links: [], // No links to underline
+                        onTap: {
+                            Task {
+                                await self.handleLinkInteraction(link: "")
+                            }
+                        }
+                    )
                     self.callback(.renderSwiftUITextViewWithLink(textView: swiftUIView))
                 } else {
                     // Fallback to plain text if HTML conversion fails
-                    let swiftUIView = BreadPartnerTextView(contentText)
+                    let swiftUIView = BreadPartnerLinkTextSwitUI(
+                        contentText,
+                        links: [],
+                        onTap: {
+                            Task {
+                                await self.handleLinkInteraction(link: "")
+                            }
+                        }
+                    )
                     self.callback(.renderSwiftUITextViewWithLink(textView: swiftUIView))
                 }
             } else {
-                // For UIKit, use plain UITextView with HTML attributed string (non-interactive)
-                let textView = UITextView()
-                textView.isEditable = false
-                textView.isScrollEnabled = false
-                textView.isSelectable = false // Make it non-interactive
-                textView.backgroundColor = .clear
+                // For UIKit, use BreadPartnerLinkText with HTML attributed string
+                let textView = BreadPartnerLinkText()
                 
                 if let attributedString = htmlString.htmlToAttributedString() {
-                    // Create a mutable copy to remove any existing link attributes
+                    // Create a mutable copy to remove any link attributes and underlines
                     let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
                     let range = NSRange(location: 0, length: mutableAttributedString.length)
                     mutableAttributedString.removeAttribute(.link, range: range)
+                    mutableAttributedString.removeAttribute(.underlineStyle, range: range)
                     
-                    textView.attributedText = mutableAttributedString
+                    textView.configure(with: mutableAttributedString) { [self] _ in
+                        Task {
+                            await handleLinkInteraction(link: "")
+                        }
+                    }
                 } else {
                     // Fallback to plain text if HTML conversion fails
-                    textView.text = contentText
+                    let plainAttributedString = NSAttributedString(string: contentText)
+                    textView.configure(with: plainAttributedString) { [self] _ in
+                        Task {
+                            await handleLinkInteraction(link: "")
+                        }
+                    }
                 }
                 
                 self.callback(.renderTextViewWithLink(textView: textView))
