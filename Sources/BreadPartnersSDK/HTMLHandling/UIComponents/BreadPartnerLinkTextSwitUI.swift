@@ -21,6 +21,7 @@ public struct BreadPartnerLinkTextSwitUI: View {
     private var linkColor: Color
     private var linkFontName: String
     private var linkFontSize: CGFloat
+    private var attributedText: NSAttributedString?
 
     public init(
         _ text: String, links: [String] = [], onTap: (() -> Void)? = nil,
@@ -32,43 +33,57 @@ public struct BreadPartnerLinkTextSwitUI: View {
         self.linkColor = .blue
         self.linkFontName = fontName
         self.linkFontSize = fontSize
+        self.attributedText = nil
+    }
+    
+    /// Initializer for attributed string (with HTML formatting preserved)
+    public init(
+        attributedString: NSAttributedString, onTap: (() -> Void)? = nil
+    ) {
+        self.text = attributedString.string
+        self.links = []
+        self.onTap = onTap
+        self.linkColor = .blue
+        self.linkFontName = "System"
+        self.linkFontSize = 17
+        self.attributedText = attributedString
     }
 
     public var body: some View {
-        let attributedString = NSMutableAttributedString(string: text)
-                let fullRange = NSRange(location: 0, length: attributedString.length)
-                attributedString.addAttribute(.font, value: fontToUIFont(fontName: linkFontName, size: linkFontSize), range: fullRange)
+        // Use provided attributedText if available (for HTML formatted content)
+        let finalAttributedString: NSAttributedString
         
-        var emptyAttributedString: NSAttributedString
-
-                    if #available(iOS 15, *) {
-                        emptyAttributedString = NSAttributedString("")
-                    } else {
-                        emptyAttributedString = NSAttributedString(string: "")
-                    }
-        
-        var nsText: NSString
-        
-        nsText = NSString(string: text)
-
-        for word in links {
-            let wordRange = nsText.range(of: word)
-            if wordRange.location != NSNotFound {
-                attributedString.addAttribute(.foregroundColor, value: colorToUIColor(linkColor), range: wordRange)
-                attributedString.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: wordRange)
-                attributedString.addAttribute(.font, value: fontToUIFont(fontName: linkFontName, size: linkFontSize), range: wordRange)
+        if let providedAttributedText = attributedText {
+            finalAttributedString = providedAttributedText
+        } else {
+            // Build attributed string from plain text and links
+            let attributedString = NSMutableAttributedString(string: text)
+            let fullRange = NSRange(location: 0, length: attributedString.length)
+            attributedString.addAttribute(.font, value: fontToUIFont(fontName: linkFontName, size: linkFontSize), range: fullRange)
+            
+            let nsText = NSString(string: text)
+            
+            for word in links {
+                let wordRange = nsText.range(of: word)
+                if wordRange.location != NSNotFound {
+                    attributedString.addAttribute(.foregroundColor, value: colorToUIColor(linkColor), range: wordRange)
+                    attributedString.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: wordRange)
+                    attributedString.addAttribute(.font, value: fontToUIFont(fontName: linkFontName, size: linkFontSize), range: wordRange)
+                }
             }
+            
+            finalAttributedString = attributedString
         }
 
         if #available(iOS 15.0, *) {
             return AnyView(
-                Text(AttributedString(attributedString))
+                Text(AttributedString(finalAttributedString))
                     .onTapGesture { onTap?() }
                     .padding()
             )
         } else {
             return AnyView(
-                UILabelRepresentable(attributedText: attributedString, onTap: onTap)
+                UILabelRepresentable(attributedText: finalAttributedString, onTap: onTap)
                     .padding()
             )
         }
