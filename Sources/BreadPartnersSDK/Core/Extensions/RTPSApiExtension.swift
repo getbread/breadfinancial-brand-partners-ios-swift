@@ -129,8 +129,7 @@ extension BreadPartnersSDK {
             let headers: [String: String] = [
                 Constants.headerClientKey: integrationKey,
                 Constants.headerRequestedWithKey: Constants
-                    .headerRequestedWithValue,
-                "X-Bread-Testing": "captcha"
+                    .headerRequestedWithValue
             ]
             
             if(cookies != nil) {

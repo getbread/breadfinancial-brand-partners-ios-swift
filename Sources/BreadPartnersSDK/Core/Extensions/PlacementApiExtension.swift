@@ -59,7 +59,7 @@ extension BreadPartnersSDK {
                          method: .POST,
                          cookies: cookie,
                          body: request,
-                         useTestHeaders: true)
+                        )
             
             await handlePlacementResponse(
                 response,
