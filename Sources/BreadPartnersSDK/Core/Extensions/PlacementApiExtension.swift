@@ -58,7 +58,8 @@ extension BreadPartnersSDK {
                          urlString: apiUrl,
                          method: .POST,
                          cookies: cookie,
-                         body: request)
+                         body: request,
+                         useTestHeaders: true)
             
             await handlePlacementResponse(
                 response,

@@ -130,6 +130,7 @@ extension BreadPartnersSDK {
                 Constants.headerClientKey: integrationKey,
                 Constants.headerRequestedWithKey: Constants
                     .headerRequestedWithValue,
+                "X-Bread-Testing": "captcha"
             ]
             
             if(cookies != nil) {
@@ -201,7 +202,7 @@ extension BreadPartnersSDK {
                                 openPlacementExperience: openPlacementExperience,
                                 forSwiftUI: forSwiftUI,
                                 logger: logger,
-                                cookies: cookies,
+                                cookies: cookie,
                                 callback: callback
                             )
                         }
