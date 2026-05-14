@@ -23,6 +23,7 @@ public struct MerchantConfiguration:@unchecked Sendable {
     public var cardholderTier: String?
     public var env: BreadPartnersEnvironment?
     public var cardEnv: String?
+    public var cardChoiceCode: String? = nil
 
     public var channel: String?
     public var subchannel: String?
@@ -39,7 +40,7 @@ public struct MerchantConfiguration:@unchecked Sendable {
     public var paymentMode: PaymentMode?
     public var providerConfig: [String: Data]?
     public var skipVerification: Bool?
-    public var custom: [String: Data]?
+    public var custom: [String: Any]?
 
     public enum PaymentMode: String,Sendable {
         case full
@@ -70,7 +71,8 @@ public struct MerchantConfiguration:@unchecked Sendable {
         paymentMode: PaymentMode? = nil,
         providerConfig: [String: Data]? = nil,
         skipVerification: Bool? = nil,
-        custom: [String: Data]? = nil
+        custom: [String: Any]? = nil,
+        cardChoiceCode: String? = nil
     ) {
         self.buyer = buyer
         self.loyaltyID = loyaltyID
@@ -96,6 +98,7 @@ public struct MerchantConfiguration:@unchecked Sendable {
         self.providerConfig = providerConfig
         self.skipVerification = skipVerification
         self.custom = custom
+        self.cardChoiceCode = cardChoiceCode
     }
 }
 
