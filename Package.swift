@@ -18,7 +18,7 @@ let package = Package(
         .package(
             url:
                 "https://github.com/GoogleCloudPlatform/recaptcha-enterprise-mobile-sdk.git",
-            from: "18.8.1"),
+            from: "18.9.1"),
     ],
     targets: [
         .target(
