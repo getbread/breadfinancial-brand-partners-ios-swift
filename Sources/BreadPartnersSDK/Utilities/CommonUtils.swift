@@ -99,6 +99,9 @@ internal actor CommonUtils: NSObject {
             "storeNumber": merchantConfiguration.storeNumber,
             "location": rtpsData.locationType?.rawValue,
             "channel": rtpsData.channel,
+            "mobilePhone": merchantConfiguration.buyer?.phone,
+            "emailAddress": merchantConfiguration.buyer?.email,
+            "alternativePhone": merchantConfiguration.buyer?.alternativePhone,
         ]
 
         if (prescreenId != nil){
