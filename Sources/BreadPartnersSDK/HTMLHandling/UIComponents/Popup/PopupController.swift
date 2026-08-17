@@ -15,7 +15,7 @@ import UIKit
 import WebKit
 
 /// A view controller responsible for managing and displaying the popup overlay.
-internal class PopupController: UIViewController,@preconcurrency AppRestartListener {
+internal class PopupController: UIViewController,@preconcurrency AppRestartListener, UITextViewDelegate  {
 
     var integrationKey: String
     var popupModel: PopupPlacementModel
@@ -33,7 +33,7 @@ internal class PopupController: UIViewController,@preconcurrency AppRestartListe
     var overlayEmbeddedView: UIView!
     var titleLabel: UILabel!
     var subtitleLabel: UILabel!
-    var disclosureLabel: UILabel!
+    var disclosureTextView: UITextView!
     var dynamicParentProductView: UIView!
     var headerLabel: UILabel!
     var headerView: UIView!
