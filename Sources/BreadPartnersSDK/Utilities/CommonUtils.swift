@@ -101,7 +101,7 @@ internal actor CommonUtils: NSObject {
             "channel": rtpsData.channel,
         ]
 
-        if(prescreenId != nil){
+        if (prescreenId != nil){
             queryParams["prescreenId"] = "\(prescreenId ?? 0)"
         }
         
@@ -112,12 +112,10 @@ internal actor CommonUtils: NSObject {
             return nil
         }
 
-        await Task {
-            urlComponents.queryItems = queryParams.compactMap { key, value in
-                guard let value = value, !value.isEmpty else { return nil }
-                return URLQueryItem(name: key, value: value)
-            }
-        }.value
+        urlComponents.queryItems = queryParams.compactMap { key, value in
+            guard let value = value, !value.isEmpty else { return nil }
+            return URLQueryItem(name: key, value: value)
+        }
 
         return urlComponents.url
     }
@@ -212,12 +210,10 @@ internal actor CommonUtils: NSObject {
             return nil
         }
 
-        await Task {
-            urlComponents.queryItems = queryParams.compactMap { key, value in
-                guard let value = value, !value.isEmpty else { return nil }
-                return URLQueryItem(name: key, value: value)
-            }
-        }.value
+        urlComponents.queryItems = queryParams.compactMap { key, value in
+            guard let value = value, !value.isEmpty else { return nil }
+            return URLQueryItem(name: key, value: value)
+        }
 
         return urlComponents.url
     }

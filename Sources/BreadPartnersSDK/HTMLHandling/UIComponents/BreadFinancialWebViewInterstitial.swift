@@ -50,7 +50,8 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
         webView.navigationDelegate = self
 
         logger.logLoadingURL(url: url)
-        let request = URLRequest(url: url)
+        var request = URLRequest(url: url)
+        request.setValue(Constants.headerPlatformValue, forHTTPHeaderField: Constants.headerPlatformKey)
         webView.load(request)
 
         return webView
