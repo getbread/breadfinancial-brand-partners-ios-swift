@@ -11,6 +11,7 @@
 //------------------------------------------------------------------------------
 
 import Foundation
+import UIKit
 
 extension PopupController {
     
@@ -35,5 +36,21 @@ extension PopupController {
                                 Constants.somethingWentWrong
                         ])))
         }
+    }
+    
+    /// Intercepts link taps in the disclosure text view.
+    /// Anchor links beginning with `#` (e.g. `#epjs-css-overlay-header`) scroll
+    /// the popup's scroll view back to the top instead of trying to open a URL.
+    func textView(
+        _ textView: UITextView,
+        shouldInteractWith URL: Foundation.URL,
+        in characterRange: NSRange,
+        interaction: UITextItemInteraction
+    ) -> Bool {
+        if URL.absoluteString == "#epjs-css-overlay-header" {
+            scrollView?.setContentOffset(.zero, animated: true)
+            return false
+        }
+        return true
     }
 }
