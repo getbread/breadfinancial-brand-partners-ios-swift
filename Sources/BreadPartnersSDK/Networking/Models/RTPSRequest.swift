@@ -32,8 +32,8 @@ internal struct RTPSRequest: Codable {
     let customerAcceptedOffer: Bool?
     let platform: String
     let alternativePhone: String?
-        let mobilePhone: String?
-        let emailAddress: String?
+    let mobilePhone: String?
+    let emailAddress: String?
     
     struct OverrideConfig: Codable {
         let enhancedPresentment: Bool?
