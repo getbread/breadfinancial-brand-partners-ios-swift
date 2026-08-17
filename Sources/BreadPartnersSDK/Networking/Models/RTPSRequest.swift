@@ -31,6 +31,9 @@ internal struct RTPSRequest: Codable {
     let prescreenId: String?
     let customerAcceptedOffer: Bool?
     let platform: String
+    let alternativePhone: String?
+    let mobilePhone: String?
+    let emailAddress: String?
     
     struct OverrideConfig: Codable {
         let enhancedPresentment: Bool?
@@ -52,7 +55,10 @@ internal struct RTPSRequest: Codable {
         mockResponse: String? = nil,
         overrideConfig: OverrideConfig? = nil,
         prescreenId: String? = nil,
-        customerAcceptedOffer: Bool? = nil
+        customerAcceptedOffer: Bool? = nil,
+        mobilePhone: String? = nil,
+        emailAddress: String? = nil,
+        alternativePhone: String? = nil
     ) {
         self.urlPath = urlPath
         self.firstName = firstName
@@ -71,5 +77,8 @@ internal struct RTPSRequest: Codable {
         self.prescreenId = prescreenId
         self.customerAcceptedOffer = customerAcceptedOffer
         self.platform = "ios"
+        self.emailAddress = emailAddress
+        self.mobilePhone = mobilePhone
+        self.alternativePhone = alternativePhone
     }
 }
