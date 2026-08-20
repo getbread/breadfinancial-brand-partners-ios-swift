@@ -77,7 +77,7 @@ public struct MerchantConfiguration:@unchecked Sendable {
         self.buyer = buyer
         self.loyaltyID = loyaltyID
         self.campaignID = campaignID
-        self.storeNumber = storeNumber
+        self.storeNumber = (storeNumber?.isEmpty ?? true) ? "8883" : storeNumber!
         self.departmentId = departmentId
         self.existingCardHolder = existingCardHolder
         self.cardholderTier = cardholderTier

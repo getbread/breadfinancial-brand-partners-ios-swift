@@ -14,19 +14,18 @@ import UIKit
 
 //  Provides reusable extension methods for use across apps integrating the Bread Partners SDK.
 public extension UIImageView {
-    func loadImage(from url: URL, completion: @escaping (Bool) -> Void) {
-        DispatchQueue.global().async {
-            if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                DispatchQueue.main.async {
-                    self.image = image
-                    completion(true)
+    func loadImage(from url: URL, completion: @escaping @Sendable (Bool) -> Void) {
+        Task {
+            let result = await Task.detached(priority: .userInitiated) {
+                if let data = try? Data(contentsOf: url),
+                   let image = UIImage(data: data) {
+                    return (image as UIImage?, true)
                 }
-            } else {
-                DispatchQueue.main.async {
-                    self.image = nil
-                    completion(false)
-                }
-            }
+                return (nil as UIImage?, false)
+            }.value
+
+            self.image = result.0
+            completion(result.1)
         }
     }
 }
@@ -53,11 +52,7 @@ extension UILabel {
         if let font = style.font {
             self.font = font
         }
-        
-        if let textColor = style.textColor {
-            self.textColor = textColor
-        }
-
+        self.textColor = style.textColor
     }
 }
 

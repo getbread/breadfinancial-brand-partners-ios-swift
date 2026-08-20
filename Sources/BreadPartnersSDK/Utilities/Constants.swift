@@ -24,6 +24,8 @@ internal class Constants{
     static let headerAuthorityKey = "authority"
     static let headerAuthorityValue = "metrics.kmsmep.com"
     static let headerAcceptKey = "Accept"
+    static let headerPlatformKey = "platform"
+    static let headerPlatformValue = "ios"
     static let headerAcceptValue = "*/*"
     static let headerAcceptEncodingKey = "Accept-Encoding"
     static let headerAcceptEncodingValue = "gzip, deflate, br, zstd"
@@ -81,4 +83,9 @@ internal class Constants{
     }
     
     static let incapsulaChallenge = "IncapsulaChallenge"
+    // Confirm Navigation dialog (mirrors Android WebView onJsBeforeUnload system dialog)
+    static let confirmNavigationTitle = "Confirm Navigation"
+    static let confirmNavigationMessage = "Changes you made may not be saved.\n\nAre you sure you want to navigate away from this page?"
+    static let confirmNavigationStayButton = "Stay"
+    static let confirmNavigationLeaveButton = "Leave"
 }

@@ -99,9 +99,12 @@ internal actor CommonUtils: NSObject {
             "storeNumber": merchantConfiguration.storeNumber,
             "location": rtpsData.locationType?.rawValue,
             "channel": rtpsData.channel,
+            "mobilePhone": merchantConfiguration.buyer?.phone,
+            "emailAddress": merchantConfiguration.buyer?.email,
+            "alternativePhone": merchantConfiguration.buyer?.alternativePhone,
         ]
 
-        if(prescreenId != nil){
+        if (prescreenId != nil){
             queryParams["prescreenId"] = "\(prescreenId ?? 0)"
         }
         
@@ -112,12 +115,10 @@ internal actor CommonUtils: NSObject {
             return nil
         }
 
-        await Task {
-            urlComponents.queryItems = queryParams.compactMap { key, value in
-                guard let value = value, !value.isEmpty else { return nil }
-                return URLQueryItem(name: key, value: value)
-            }
-        }.value
+        urlComponents.queryItems = queryParams.compactMap { key, value in
+            guard let value = value, !value.isEmpty else { return nil }
+            return URLQueryItem(name: key, value: value)
+        }
 
         return urlComponents.url
     }
@@ -212,12 +213,10 @@ internal actor CommonUtils: NSObject {
             return nil
         }
 
-        await Task {
-            urlComponents.queryItems = queryParams.compactMap { key, value in
-                guard let value = value, !value.isEmpty else { return nil }
-                return URLQueryItem(name: key, value: value)
-            }
-        }.value
+        urlComponents.queryItems = queryParams.compactMap { key, value in
+            guard let value = value, !value.isEmpty else { return nil }
+            return URLQueryItem(name: key, value: value)
+        }
 
         return urlComponents.url
     }

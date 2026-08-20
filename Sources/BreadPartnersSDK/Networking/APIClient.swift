@@ -64,6 +64,7 @@ internal class APIClient: @unchecked Sendable {
             Constants.headerContentType: Constants.headerContentTypeValue,
             Constants.headerUserAgentKey: CommonUtils().getUserAgent(),
             Constants.headerOriginKey: Constants.headerOriginValue,
+            Constants.headerPlatformKey: Constants.headerPlatformValue,
         ]
 
         var updatedHeaders = (headers ?? [:]).merging(
