@@ -341,31 +341,19 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
     private var isDisclosurePresenting = false
 
     /// Presents the disclosure content as a PDF using QLPreviewController.
-    /// On iOS 14+ uses WKWebView.createPDF(); on iOS 13 falls back to
     /// UIPrintPageRenderer to generate the PDF from the webview's content.
     internal func presentDisclosureAsPDF(from webView: WKWebView) {
         guard !isDisclosurePresenting else { return }
         isDisclosurePresenting = true
-        if #available(iOS 14.0, *) {
-            let config = WKPDFConfiguration()
-            webView.createPDF(configuration: config) { [weak self] result in
-                switch result {
-                case .success(let data):
-                    self?.presentPDF(data: data)
-                case .failure(let error):
-                    self?.presentDisclosureWebView(webView)
-                    self?.callback(.sdkError(error: error))
-                }
-            }
-        } else {
-            // iOS 13: render the WKWebView content to PDF using UIPrintPageRenderer.
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                if let data = webView.exportAsPDF() {
-                    self.presentPDF(data: data)
-                } else {
-                    self.presentDisclosureWebView(webView)
-                }
+    
+        let config = WKPDFConfiguration()
+        webView.createPDF(configuration: config) { [weak self] result in
+            switch result {
+            case .success(let data):
+                self?.presentPDF(data: data)
+            case .failure(let error):
+                self?.presentDisclosureWebView(webView)
+                self?.callback(.sdkError(error: error))
             }
         }
     }
@@ -526,18 +514,15 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
     /// locate one at runtime.
     ///
     /// - On iOS 15+, `keyWindow` is available directly on `UIWindowScene`.
-    /// - On iOS 13–14, we fall back to iterating `UIApplication.shared.windows`.
     /// - The presentation chain is walked so the alert is never presented on a
     ///   controller that is already presenting another one.
     private func topViewController() -> UIViewController? {
         var root: UIViewController?
-        if #available(iOS 15.0, *) {
-            root = UIApplication.shared.connectedScenes
-                .compactMap({ ($0 as? UIWindowScene)?.keyWindow?.rootViewController })
-                .first
-        } else {
-            root = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.rootViewController
-        }
+        
+        root = UIApplication.shared.connectedScenes
+            .compactMap({ ($0 as? UIWindowScene)?.keyWindow?.rootViewController })
+            .first
+        
         // Walk up the presentation chain to get the topmost presented view controller,
         // so the alert is not presented on a controller that is already presenting another one.
         var top = root
@@ -628,37 +613,5 @@ private class DisclosurePDFPreviewDataSource: NSObject, QLPreviewControllerDataS
     func numberOfPreviewItems(in controller: QLPreviewController) -> Int { 1 }
     func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
         url as QLPreviewItem
-    }
-}
-
-// MARK: - iOS 13 PDF export
-
-private extension WKWebView {
-    /// Renders the webview's current content to a PDF `Data` blob using
-    /// `UIPrintPageRenderer`. This is the iOS 13-compatible alternative to
-    /// `WKWebView.createPDF()` which requires iOS 14+.
-    ///
-    /// - Returns: PDF data, or `nil` if rendering failed.
-    func exportAsPDF() -> Data? {
-        let renderer = UIPrintPageRenderer()
-        renderer.addPrintFormatter(viewPrintFormatter(), startingAtPageAt: 0)
-
-        // A4 page size in points (72 pts/inch).
-        let pageSize = CGSize(width: 595.2, height: 841.8)
-        let printableRect = CGRect(origin: .zero, size: pageSize).insetBy(dx: 36, dy: 36)
-        let paperRect = CGRect(origin: .zero, size: pageSize)
-
-        renderer.setValue(NSValue(cgRect: paperRect), forKey: "paperRect")
-        renderer.setValue(NSValue(cgRect: printableRect), forKey: "printableRect")
-
-        let data = NSMutableData()
-        UIGraphicsBeginPDFContextToData(data, paperRect, nil)
-        renderer.prepare(forDrawingPages: NSRange(location: 0, length: renderer.numberOfPages))
-        for page in 0 ..< renderer.numberOfPages {
-            UIGraphicsBeginPDFPage()
-            renderer.drawPage(at: page, in: UIGraphicsGetCurrentContext()!.boundingBoxOfClipPath)
-        }
-        UIGraphicsEndPDFContext()
-        return data.length > 0 ? data as Data : nil
     }
 }
