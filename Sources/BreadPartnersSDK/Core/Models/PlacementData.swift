@@ -31,13 +31,24 @@ public class PlacementData: @unchecked Sendable {
     public var order: Order?
     public var defaultSelectedCardKey: String?
     public var selectedCardKey: String?
-
+    public var upqInSessionToken: String?
+    public var financingBuyerId: String?
+    public var prequalificationId: String?
+    public var prequalCreditLimit: String?
+    
     public init(
         financingType: BreadPartnersFinancingType? = nil,
         locationType: BreadPartnersLocationType? = nil,
         placementId: String? = nil,
-        domID: String? = nil, allowCheckout: Bool? = nil, order: Order? = nil,
-        defaultSelectedCardKey: String? = nil, selectedCardKey: String? = nil
+        domID: String? = nil,
+        allowCheckout: Bool? = nil,
+        order: Order? = nil,
+        defaultSelectedCardKey: String? = nil, 
+        selectedCardKey: String? = nil,
+        upqInSessionToken: String? = nil,
+        financingBuyerId: String? = nil,
+        prequalificationId: String? = nil,
+        prequalCreditLimit: String? = nil,
     ) {
         self.financingType = financingType
         self.locationType = locationType
@@ -47,6 +58,10 @@ public class PlacementData: @unchecked Sendable {
         self.order = order
         self.defaultSelectedCardKey = defaultSelectedCardKey
         self.selectedCardKey = selectedCardKey
+        self.upqInSessionToken = upqInSessionToken
+        self.financingBuyerId = financingBuyerId
+        self.prequalificationId = financingBuyerId
+        self.prequalCreditLimit = financingBuyerId
     }
 }
 
@@ -110,16 +125,21 @@ public class Order: @unchecked Sendable {
     public var totalTax: CurrencyValue?
     public var discountCode: String?
     public var pickupInformation: PickupInformation?
-    public var fulfillmentType: String?
+    public var fulfillmentType: OrderFulfillmentType?
     public var items: [Item]?
-
+    public var bnplEligible: Bool?
+    
     public init(
-        subTotal: CurrencyValue? = nil, totalDiscounts: CurrencyValue? = nil,
+        subTotal: CurrencyValue? = nil,
+        totalDiscounts: CurrencyValue? = nil,
         totalPrice: CurrencyValue? = nil,
-        totalShipping: CurrencyValue? = nil, totalTax: CurrencyValue? = nil,
+        totalShipping: CurrencyValue? = nil,
+        totalTax: CurrencyValue? = nil,
         discountCode: String? = nil,
         pickupInformation: PickupInformation? = nil,
-        fulfillmentType: String? = nil, items: [Item]? = nil
+        fulfillmentType: OrderFulfillmentType? = nil,
+        items: [Item]? = nil,
+        bnplEligible: Bool? = nil
     ) {
         self.subTotal = subTotal
         self.totalDiscounts = totalDiscounts
@@ -130,15 +150,16 @@ public class Order: @unchecked Sendable {
         self.pickupInformation = pickupInformation
         self.fulfillmentType = fulfillmentType
         self.items = items
+        self.bnplEligible = bnplEligible
     }
 }
 
 /// Specifies a currency value.
 public class CurrencyValue: @unchecked Sendable {
     public var currency: String?
-    public var value: Double?
+    public var value: Int64?
 
-    public init(currency: String? = nil, value: Double? = nil) {
+    public init(currency: String? = nil, value: Int64? = nil) {
         self.currency = currency
         self.value = value
     }
@@ -216,18 +237,24 @@ public class Item: @unchecked Sendable {
     public var shippingDescription: String?
     public var shippingTrackingNumber: String?
     public var shippingTrackingUrl: String?
-    public var fulfillmentType: String?
+    public var fulfillmentType: ItemFulfillmentType?
 
     public init(
-        name: String? = nil, category: String? = nil, quantity: Int? = nil,
+        name: String? = nil,
+        category: String? = nil,
+        quantity: Int? = nil,
         unitPrice: CurrencyValue? = nil,
-        unitTax: CurrencyValue? = nil, sku: String? = nil,
-        itemUrl: String? = nil, imageUrl: String? = nil,
-        description: String? = nil, shippingCost: CurrencyValue? = nil,
+        unitTax: CurrencyValue? = nil,
+        sku: String? = nil,
+        itemUrl: String? = nil,
+        imageUrl: String? = nil,
+        description: String? = nil,
+        shippingCost: CurrencyValue? = nil,
         shippingProvider: String? = nil,
         shippingDescription: String? = nil,
         shippingTrackingNumber: String? = nil,
-        shippingTrackingUrl: String? = nil, fulfillmentType: String? = nil
+        shippingTrackingUrl: String? = nil,
+        fulfillmentType: ItemFulfillmentType? = nil
     ) {
         self.name = name
         self.category = category
@@ -245,4 +272,24 @@ public class Item: @unchecked Sendable {
         self.shippingTrackingUrl = shippingTrackingUrl
         self.fulfillmentType = fulfillmentType
     }
+}
+
+
+public let ineligibleItemCategories: Set<String> = [
+    "non-leasable", "nonleasable"
+]
+
+/// Enum representing different fulfillment types for orders.
+public enum OrderFulfillmentType: String {
+    case pickup = "PICKUP"
+    case delivery = "DELIVERY"
+    case multiple = "MULTIPLE"
+    case unknown = "UNKNOWN"
+}
+
+/// Enum representing different fulfillment types for items.
+public enum ItemFulfillmentType: String {
+    case pickup = "PICKUP"
+    case delivery = "DELIVERY"
+    case unknown = "UNKNOWN"
 }

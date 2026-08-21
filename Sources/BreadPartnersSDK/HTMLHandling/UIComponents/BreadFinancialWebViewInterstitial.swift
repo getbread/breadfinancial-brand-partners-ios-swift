@@ -240,6 +240,7 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
                     logger.logApplicationResultDetails(payload)
                     callback(.webViewSuccess(result: payload))
                     callback(.receiveUnifiedCheckoutApplicationResult(result: payload))
+                    callback(.popupClosed)
                 }
                 
             case "SUBMIT_PREQUAL_APPLICATION":
