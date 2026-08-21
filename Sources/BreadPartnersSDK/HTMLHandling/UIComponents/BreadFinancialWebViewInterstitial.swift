@@ -19,7 +19,7 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
 {
 
     init(
-        logger:Logger,
+        logger: Logger,
         callback: @escaping (BreadPartnerEvents) -> Void
     ) {
         self.logger = logger
@@ -57,7 +57,7 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
         webView.navigationDelegate = self
         webView.uiDelegate = self
 
-        Logger().logLoadingURL(url: url)
+        logger.logLoadingURL(url: url)
         var request = URLRequest(url: url)
         request.setValue(Constants.headerPlatformValue, forHTTPHeaderField: Constants.headerPlatformKey)
         webView.load(request)
@@ -306,13 +306,18 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
         return nil
     }
 
-    /// Creates an off-screen `WKWebView` using the provided configuration and returns it so
-    /// WebKit can write disclosure HTML into it (via `document.write()`).  Once the HTML
-    /// has loaded, the content is rendered to a PDF via `WKWebView.createPDF()` (iOS 14+)
-    /// and displayed with `QLPreviewController`.  On iOS 13 it falls back to displaying
-    /// the `WKWebView` directly in a modal sheet.
+    /// Creates an off-screen `WKWebView` for capturing disclosure content that the web app
+    /// injects into a new window via `window.open()` + `document.write()`.
     ///
-    /// - Returns: The off-screen `WKWebView` instance so WebKit can route content into it.
+    /// Called from the `WKUIDelegate` new-window callback when the requested URL is empty.
+    /// The web view is given a large off-screen frame (800×1200) for a reasonable PDF page
+    /// size, and is retained via associated objects so it survives until the asynchronous
+    /// PDF export completes. A one-shot `DisclosurePDFLoader` is attached as its navigation
+    /// delegate to wait for the HTML to load and then trigger PDF generation.
+    ///
+    /// - Parameter configuration: The WebKit-supplied config, reused so the popup shares the
+    ///   parent's process pool and data store.
+    /// - Returns: The off-screen `WKWebView` for WebKit to write disclosure content into.
     private func makeDisclosureCaptureWebView(with configuration: WKWebViewConfiguration) -> WKWebView {
         // Use a large off-screen frame so the PDF page size is reasonable.
         let offscreenFrame = CGRect(x: 0, y: 0, width: 800, height: 1200)
