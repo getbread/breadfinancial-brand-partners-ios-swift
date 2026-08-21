@@ -352,7 +352,6 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
             case .success(let data):
                 self?.presentPDF(data: data)
             case .failure(let error):
-                self?.presentDisclosureWebView(webView)
                 self?.callback(.sdkError(error: error))
             }
         }
@@ -379,39 +378,6 @@ internal class BreadFinancialWebViewInterstitial: NSObject,
             topVC.present(previewVC, animated: true) {
                 self?.isDisclosurePresenting = false
             }
-        }
-    }
-
-    /// Fallback disclosure viewer: presents the raw `WKWebView` in a modal sheet.
-    /// Used when PDF generation is unavailable (iOS < 14) or when `createPDF` fails.
-    internal func presentDisclosureWebView(_ webView: WKWebView) {
-        DispatchQueue.main.async { [weak self] in
-            guard let topVC = self?.topViewController() else { return }
-
-            let containerVC = UIViewController()
-            containerVC.view.backgroundColor = .systemBackground
-            containerVC.modalPresentationStyle = .pageSheet
-
-            let closeButton = UIButton(type: .system)
-            closeButton.setTitle("Close", for: .normal)
-            closeButton.translatesAutoresizingMaskIntoConstraints = false
-            closeButton.addTarget(containerVC, action: #selector(UIViewController.dismissSelf), for: .touchUpInside)
-
-            webView.translatesAutoresizingMaskIntoConstraints = false
-            containerVC.view.addSubview(webView)
-            containerVC.view.addSubview(closeButton)
-
-            let safeArea = containerVC.view.safeAreaLayoutGuide
-            NSLayoutConstraint.activate([
-                closeButton.topAnchor.constraint(equalTo: safeArea.topAnchor, constant: 8),
-                closeButton.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -16),
-                webView.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 8),
-                webView.leadingAnchor.constraint(equalTo: containerVC.view.leadingAnchor),
-                webView.trailingAnchor.constraint(equalTo: containerVC.view.trailingAnchor),
-                webView.bottomAnchor.constraint(equalTo: containerVC.view.bottomAnchor),
-            ])
-
-            topVC.present(containerVC, animated: true)
         }
     }
 
@@ -597,12 +563,6 @@ private class DisclosurePDFLoader: NSObject, WKNavigationDelegate, WKScriptMessa
         // Remove handler to prevent duplicate calls
         userContentController.removeScriptMessageHandler(forName: "disclosureReady")
         owner?.presentDisclosureAsPDF(from: wv)
-    }
-
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        webView.configuration.userContentController
-            .removeScriptMessageHandler(forName: "disclosureReady")
-        owner?.presentDisclosureWebView(webView)
     }
 }
 
