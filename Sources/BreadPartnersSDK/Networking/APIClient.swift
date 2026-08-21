@@ -193,7 +193,7 @@ internal class APIClient: @unchecked Sendable {
                 return AnySendable(value: jsonDict)
             } else {
                 throw NSError(
-                    domain: "BreadPartnersSDKSwift", code: 0,
+                    domain: "BreadPartnersSDK", code: 0,
                     userInfo: [NSLocalizedDescriptionKey: "Invalid JSON format"]
                 )
             }
