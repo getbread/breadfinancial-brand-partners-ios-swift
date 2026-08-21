@@ -4,14 +4,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "BreadPartnersSDKSwift",
+    name: "BreadPartnersSDK",
     platforms: [
         .iOS(.v15)
     ],
     products: [
         .library(
-            name: "BreadPartnersSDKSwift",
-            targets: ["BreadPartnersSDKSwift"])
+            name: "BreadPartnersSDK",
+            targets: ["BreadPartnersSDK"])
     ],
     dependencies: [
         .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.7.5"),
@@ -22,7 +22,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "BreadPartnersSDKSwift",
+            name: "BreadPartnersSDK",
             dependencies: [
                 "SwiftSoup",
                 .product(
