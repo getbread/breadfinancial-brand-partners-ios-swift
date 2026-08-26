@@ -314,7 +314,7 @@ extension PopupController {
 
                 disclosureTextView.topAnchor.constraint(
                     equalTo: dynamicParentProductView.bottomAnchor,
-                    constant: paddingVerticalFive),
+                    constant: disclosureTopPadding),
             ])
         } else {
             NSLayoutConstraint.activate([
