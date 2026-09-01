@@ -12,6 +12,7 @@
 
 import WebKit
 
+@MainActor
 internal class ChallengeController: UIViewController, WKNavigationDelegate, WKHTTPCookieStoreObserver {
 
     private var webView: WKWebView!

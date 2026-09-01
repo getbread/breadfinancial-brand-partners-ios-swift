@@ -59,7 +59,7 @@ extension PopupController {
         subtitleLabel = PopupElements.shared.createLabel(
             withText: popupModel.overlaySubtitle,
             style: popupStyle.subTitlePopupTextStyle)
-        disclosureTextView = PopupElements.shared.createDisclosureTextView(
+        disclosureTextView = await PopupElements.shared.createDisclosureTextView(
             withText: popupModel.disclosure,
             rawHTML: popupModel.disclosureHTML,
             style: popupStyle.disclosurePopupTextStyle,
