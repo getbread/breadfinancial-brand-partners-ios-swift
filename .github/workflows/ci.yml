@@ -28,5 +28,18 @@ jobs:
       - name: Run SwiftLint
         run: Scripts/lint.sh
 
+      - name: Show Apple toolchain
+        run: |
+          xcodebuild -version
+          xcode-select -p
+          xcrun --sdk iphoneos --show-sdk-version
+
       - name: Verify Build for iOS
-        run: xcodebuild -scheme BreadPartnersSDK -destination 'generic/platform=iOS' build
+        run: |
+          xcodebuild \
+            -scheme BreadPartnersSDK \
+            -destination 'generic/platform=iOS' \
+            -sdk iphoneos \
+            -verbose \
+            CODE_SIGNING_ALLOWED=NO \
+            build
