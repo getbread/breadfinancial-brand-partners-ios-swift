@@ -166,7 +166,7 @@ internal actor PopupElements: NSObject {
         return button
     }
 
-    func createDisclosureTextView(
+    @MainActor func createDisclosureTextView(
         withText text: NSAttributedString,
         rawHTML: String,
         style: PopupTextStyle,
