@@ -4,5 +4,8 @@
   },
   "lineLength": 120,
   "maximumBlankLines": 1,
-  "respectsExistingLineBreaks": true
+  "respectsExistingLineBreaks": true,
+  "rules": {
+    "AlwaysUseLowerCamelCase": false
+  }
 }
