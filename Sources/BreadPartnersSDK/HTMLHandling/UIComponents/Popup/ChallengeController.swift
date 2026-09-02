@@ -24,13 +24,14 @@ internal class ChallengeController: UIViewController, WKNavigationDelegate, WKHT
     private let logger: Logger
     private var calledCaptchaCompleted: Bool = false
     private var hasFinisedLoading: Bool = false
-    
-    
-    init(htmlContent: String,
-         originalURL: String,
-         callback: ((BreadPartnerEvents) -> Void)? = nil,
-         onComplete: @escaping (String) -> Void,
-         logger: Logger,
+    private var hasRemovedCookieObserver: Bool = false
+
+    init(
+        htmlContent: String,
+        originalURL: String,
+        callback: ((BreadPartnerEvents) -> Void)? = nil,
+        onComplete: @escaping (String) -> Void,
+        logger: Logger,
     ) {
         self.htmlContent = htmlContent
         self.originalURL = originalURL
@@ -43,10 +44,24 @@ internal class ChallengeController: UIViewController, WKNavigationDelegate, WKHT
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     deinit {
-        // Important: Remove the observer manually
+        guard Thread.isMainThread else { return }
+        MainActor.assumeIsolated {
+            removeCookieObserver()
+        }
+    }
+
+    @MainActor
+    private func removeCookieObserver() {
+        guard !hasRemovedCookieObserver else { return }
+        hasRemovedCookieObserver = true
         webView.configuration.websiteDataStore.httpCookieStore.remove(self)
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        removeCookieObserver()
     }
 
     override func viewDidLoad() {
@@ -66,27 +81,22 @@ internal class ChallengeController: UIViewController, WKNavigationDelegate, WKHT
         view.addSubview(closeButton)
 
         let config = WKWebViewConfiguration()
-        
-        if #available(iOS 14.0, *) {
-            let preferences = WKWebpagePreferences()
-            preferences.allowsContentJavaScript = true
-            config.defaultWebpagePreferences = preferences
-        } else {
-            // For iOS versions below 14.0, JavaScript is enabled by default
-            config.preferences.javaScriptEnabled = true
-        }
+
+        let preferences = WKWebpagePreferences()
+        preferences.allowsContentJavaScript = true
+        config.defaultWebpagePreferences = preferences
 
         webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = self
         webView.translatesAutoresizingMaskIntoConstraints = false
         webView.configuration.websiteDataStore.httpCookieStore.add(self)
-        
+
         if #available(iOS 16.4, *) {
             webView.isInspectable = true
         }
 
         view.addSubview(webView)
-        
+
         NSLayoutConstraint.activate([
             closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             closeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
@@ -96,7 +106,7 @@ internal class ChallengeController: UIViewController, WKNavigationDelegate, WKHT
             webView.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 10),
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
 
@@ -109,16 +119,21 @@ internal class ChallengeController: UIViewController, WKNavigationDelegate, WKHT
         dismiss(animated: true)
     }
 
-    func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationAction: WKNavigationAction,
-                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+    func webView(
+        _ webView: WKWebView,
+        decidePolicyFor navigationAction: WKNavigationAction,
+        decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+    ) {
         guard let url = navigationAction.request.url else {
             decisionHandler(.cancel)
             return
         }
 
         // Allow necessary domains
-        let allowedDomains = ["comenity.net", "breadfinancial.com", "hcaptcha.com", "gstatic.com", "newassets.hcaptcha.com", "brands.kmsmep.com"]
+        let allowedDomains = [
+            "comenity.net", "breadfinancial.com", "hcaptcha.com", "gstatic.com", "newassets.hcaptcha.com",
+            "brands.kmsmep.com",
+        ]
 
         if let host = url.host {
             if allowedDomains.contains(where: { host.contains($0) }) {
@@ -132,11 +147,11 @@ internal class ChallengeController: UIViewController, WKNavigationDelegate, WKHT
             decisionHandler(.allow)
             return
         }
-        
+
         decisionHandler(.cancel)
         return
     }
-    
+
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         self.hasFinisedLoading = true
     }
@@ -148,22 +163,22 @@ internal class ChallengeController: UIViewController, WKNavigationDelegate, WKHT
     }
 
     // This method is called whenever cookies change
-   func cookiesDidChange(in cookieStore: WKHTTPCookieStore) {
-       if hasInitialLoadCompleted  {
-           cookieStore.getAllCookies { cookies in
-               var cookieString = ""
-               
-               for cookie in cookies {
-                   cookieString.append("\(cookie.name)=\(cookie.value); ")
-               }
-       
-               if cookieString.contains("incap_ses") && !self.calledCaptchaCompleted && self.hasFinisedLoading {
-                   self.calledCaptchaCompleted = true
-                   self.logger.printLog("Completing captcha with cookies: \(cookieString)")
-                   self.onComplete(cookieString)
-                   self.dismiss(animated: true)
-               }
-           }
-       }
-   }
+    func cookiesDidChange(in cookieStore: WKHTTPCookieStore) {
+        if hasInitialLoadCompleted {
+            cookieStore.getAllCookies { cookies in
+                var cookieString = ""
+
+                for cookie in cookies {
+                    cookieString.append("\(cookie.name)=\(cookie.value); ")
+                }
+
+                if cookieString.contains("incap_ses") && !self.calledCaptchaCompleted && self.hasFinisedLoading {
+                    self.calledCaptchaCompleted = true
+                    self.logger.printLog("Completing captcha with cookies: \(cookieString)")
+                    self.onComplete(cookieString)
+                    self.dismiss(animated: true)
+                }
+            }
+        }
+    }
 }
