@@ -82,7 +82,7 @@ internal class ChallengeController: UIViewController, WKNavigationDelegate, WKHT
         view.addSubview(closeButton)
 
         let config = WKWebViewConfiguration()
-        
+
         let preferences = WKWebpagePreferences()
         preferences.allowsContentJavaScript = true
         config.defaultWebpagePreferences = preferences
